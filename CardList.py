@@ -58,3 +58,12 @@ class Hand(CardList):
         self.cards.remove(card)
 
 
+class Palette(CardList):
+    def __init__(self, cards: list[Card]):
+        super(Palette, self).__init__(cards)
+
+    def playable_cards(self, max_card: Card) -> list[Card]:
+        return [card for card in self.cards if card.playable(max_card)]
+
+
+

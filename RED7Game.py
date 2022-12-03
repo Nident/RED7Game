@@ -44,36 +44,30 @@ class RED7GAME:
 
         current_player = self.current_player()  # игрок чей сейчас ход
 
-        cards = self.get_playable_card(self.rule)
-        print(cards, "GOT CARDS")
+        playable_cards = self.get_playable_card(self.rule)
+        # print(playable_cards, "GOT CARDS")
 
-        if len(cards):
-            card = cards[0]
+        if len(playable_cards):
+            card = playable_cards[0]
             print(f'{current_player.name}: Играет {card}')
-            # current_player.heap.add(card)
-        # else:
-        #     # Если подходящей карты нет, берет карту из колоды
-        #     print('Берет карту из колоды')
-        #     card = self.deck.draw()
-        #     if card.playable(top):
-        #         print(f'Играет {card}')
-        #     else:
-        #         print('Пас!')
-        #         current_player.add_card_to_hand(card)
-        #
-        # # после розыгрыша карт печатаем руку игрока и разделитель
-        # print(current_player)
-        # print('-' * 20)
-        #
-        # # если все карты с руки сыграны, игра окончена
-        # if current_player.no_cards():
-        #     return False
-        #
-        # # Ход переходит другому игроку.
-        # self.next_player()
-        # # игра продолжается
+            current_player.add_to_palette(card)
+        else:
+            # Если подходящей карты нет...
+            print('либо меняем правила либо пас')
+            return False
 
-        return False
+        # после розыгрыша карт печатаем руку игрока и разделитель
+        print(current_player)
+        print('-' * 20)
+
+        # если все карты с руки сыграны, игра окончена
+        if current_player.no_cards():
+            return False
+
+        # Ход переходит другому игроку.
+        self.next_player()
+        # игра продолжается
+        return True
 
     def get_playable_card(self, rule) -> Card:
         """ Возвращаем первую подходящую карту для игры по правилу(rule) или None, если подходящих карт нет. """
@@ -103,21 +97,22 @@ class RED7GAME:
         return cards
 
     def red_rule(self):
-        print("RED")
+        print("RED RULE")
         other_palettes = []
-        maximum_current_card = None
 
-        for i in self.players:
-            other_palettes.append(i.palette)
+        for player in self.players:
+            # print(player.palette)
+            other_palettes.extend(player.palette)
 
         other_palettes.pop(self.player_index)  # Удаляем палитру текущего игрока
-        max_card = Card.max_card(other_palettes)  # Находим максимальную карту во всех палитрах(кроме играющего)
-        print(max_card)
+        print(other_palettes)
 
-        playable_hand = self.current_player().hand
+        max_card = Card.max_card(other_palettes)  # Находим максимальную карту во всех палитрах(кроме играющего)
+        print('Max Card in players palettes:', max_card)
+
+        # playable_hand = self.current_player().hand
         playable_cards = self.current_player().hand.playable_cards(max_card)  # карты которыми можо сыграть
 
-        print(playable_cards)
         return playable_cards
 
 
@@ -169,5 +164,5 @@ class RED7GAME:
         self.heap[0]
 
 
-game = RED7GAME.create(['ME', 'NOTME', 'OTHER'])
+game = RED7GAME.create(['ME', 'NOTME'])
 game.run()
