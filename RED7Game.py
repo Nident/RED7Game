@@ -13,7 +13,7 @@ class RED7GAME:
         self.heap = None    # верхняя карта
         self.players = None    # игроки
         self.player_index = None    # индекс текущего игрока
-        self.rule = ('green', '')  # верхняя карта палитры(правило игры)
+        self.rule = ('purple', '')  # верхняя карта палитры(правило игры)
 
     @staticmethod
     def create(name_list: list[str], cards: list[Card] | None = None):
@@ -112,7 +112,7 @@ class RED7GAME:
         # print(other_palettes)
 
         max_card = Card.max_card(other_palettes)  # Находим максимальную карту во всех палитрах(кроме играющего)
-        print('Max Card in players palettes:', max_card)
+        # print('Max Card in players palettes:', max_card)
 
         playable_cards = self.current_player().hand.playable_cards_red(max_card)  # карты которыми можо сыграть
 
@@ -222,12 +222,13 @@ class RED7GAME:
             other_palettes.append(len(palettes))
 
         current_palette = other_palettes.pop(self.player_index)
-        print(current_palette)
+        # print(current_palette)
+
         max_equal = max(other_palettes)
         if current_palette >= max_equal:
             playable_cards = self.current_player().hand.playable_cards_green()
-        print(max_equal)
-        print(playable_cards)
+        # print(max_equal)
+        # print(playable_cards)
 
         return playable_cards
 
@@ -242,9 +243,27 @@ class RED7GAME:
         print(get_all_hands)
 
     def purple_rule(self):
-        print("purple")
-        get_all_hands = self.players
-        print(get_all_hands)
+        print("PURPLE RULE")
+        other_palettes = []
+        playable_cards = []
+
+        for player in self.players:
+            """Считываем последовательность номиналом меньше 4 у игроков"""
+            for card in player.palette:
+                palettes = []
+                if card.number < 4:
+                    palettes.append(card)
+            other_palettes.append(len(palettes))
+
+        current_palette = other_palettes.pop(self.player_index)
+        # print(current_palette, 'asddsadasq')
+        # print(other_palettes)
+
+        max_less_four = max(other_palettes)
+        if current_palette >= max_less_four:
+            playable_cards = self.current_player().hand.playable_cards_purple()
+
+        return playable_cards
 
 
     def congratulation_winner(self):

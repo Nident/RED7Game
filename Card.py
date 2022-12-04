@@ -43,6 +43,9 @@ class Card:
     def playable_green(self):
         return self.number % 2 == 0
 
+    def playable_purple(self):
+        return self.number < 4
+
     @staticmethod
     def create(short_form: str):
         """ Из строки 'r3' делает карту Card('red', 3) """

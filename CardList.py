@@ -64,6 +64,9 @@ class Hand(CardList):
     def playable_cards_green(self):
         return [card for card in self.cards if card.playable_green()]
 
+    def playable_cards_purple(self):
+        return [card for card in self.cards if card.playable_purple()]
+
     def remove(self, card: Card):
         self.cards.remove(card)
 
