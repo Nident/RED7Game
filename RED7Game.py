@@ -13,7 +13,7 @@ class RED7GAME:
         self.heap = None    # верхняя карта
         self.players = None    # игроки
         self.player_index = None    # индекс текущего игрока
-        self.rule = ('purple', '')  # верхняя карта палитры(правило игры)
+        self.rule = ('lightblue', '')  # верхняя карта палитры(правило игры)
 
     @staticmethod
     def create(name_list: list[str], cards: list[Card] | None = None):
@@ -91,7 +91,7 @@ class RED7GAME:
             cards = self.yellow_rule()
         elif rule[0] == 'green':
             cards = self.green_rule()
-        elif rule[0] == 'lightBlue':
+        elif rule[0] == 'lightblue':
             cards = self.lightBlue_rule()
         elif rule[0] == 'blue':
             cards = self.blue_rule()
@@ -233,9 +233,27 @@ class RED7GAME:
         return playable_cards
 
     def lightBlue_rule(self):
-        print("lightblue")
-        get_all_hands = self.players
-        print(get_all_hands)
+        print("LIGHTBLUE")
+        other_palettes = []
+        playable_cards = []
+
+        for player in self.players:
+            """Считываем последовательность номиналом меньше 4 у игроков"""
+            palettes = []
+            for card in player.palette:
+                palettes.append(card.color)
+            other_palettes.append(set(palettes))
+
+        current_palette = other_palettes.pop(self.player_index)
+        my_max = len(current_palette)
+        other_max = []
+        for i in other_palettes:
+            other_max.append(len(i))
+
+        if my_max >= max(other_max):
+            playable_cards = self.current_player().hand.playable_cards_lightBlue(current_palette)
+
+        return playable_cards
 
     def blue_rule(self):
         print("blue")

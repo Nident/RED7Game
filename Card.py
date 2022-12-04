@@ -43,6 +43,9 @@ class Card:
     def playable_green(self):
         return self.number % 2 == 0
 
+    def playable_lightBlue(self, current_palette):
+        return self.number not in current_palette
+
     def playable_purple(self):
         return self.number < 4
 
