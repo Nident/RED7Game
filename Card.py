@@ -37,6 +37,12 @@ class Card:
     def playable_orange(self, max_number):
         return self.number == max_number
 
+    def playable_yellow(self, max_color):
+        return self.color == max_color
+
+    def playable_green(self):
+        return self.number % 2 == 0
+
     @staticmethod
     def create(short_form: str):
         """ Из строки 'r3' делает карту Card('red', 3) """

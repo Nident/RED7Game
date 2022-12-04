@@ -28,6 +28,7 @@ class Deck(CardList):
         self.cards = self.cards[1:]
         return card
 
+    # random.seed(12)
     def shuffle(self):
         random.shuffle(self.cards)
 
@@ -56,6 +57,12 @@ class Hand(CardList):
 
     def playable_cards_orange(self, max_number):
         return [card for card in self.cards if card.playable_orange(max_number)]
+
+    def playable_cards_yellow(self, max_color):
+        return [card for card in self.cards if card.playable_yellow(max_color)]
+
+    def playable_cards_green(self):
+        return [card for card in self.cards if card.playable_green()]
 
     def remove(self, card: Card):
         self.cards.remove(card)
