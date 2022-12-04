@@ -27,12 +27,15 @@ class Card:
     def __eq__(self, other):
         return self.color == other.color and self.number == other.number
 
-    def playable(self, max_card) -> bool:
+    def playable_red(self, max_card) -> bool:
         """ Возвращает True, если self можно сыграть по правилу. """
         if self.number > max_card.number:
             return max_card
         elif self.number == max_card.number and Card.COLORS.index(self.color) < Card.COLORS.index(max_card.color):
             return max_card
+
+    def playable_orange(self, max_number):
+        return self.number == max_number
 
     @staticmethod
     def create(short_form: str):

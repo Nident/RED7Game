@@ -1,11 +1,13 @@
 from Card import Card
-from CardList import Hand, Palette
+from CardList import Hand
 
 
 class Player:
     def __init__(self, name: str, cards: list[Card]):
         self.name = name
         self.palette = [cards[-1]]
+        # self.palette = cards[3:-1]
+
         self.hand = Hand(cards[:-1])
         # print(self.hand)
         # self.palette = Palette([cards[0]])
@@ -28,6 +30,7 @@ class Player:
 
     def add_to_palette(self, card: Card):
         self.palette.append(card)
+        self.hand.remove(card)
         # print(self.palette, 'Paletteeeeeeeeeeeeeeeeeeee')
 
 

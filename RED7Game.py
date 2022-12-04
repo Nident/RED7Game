@@ -1,6 +1,7 @@
 from CardList import Deck, Heap
 from Player import Player
 from Card import Card
+from collections import Counter
 
 
 class RED7GAME:
@@ -12,7 +13,7 @@ class RED7GAME:
         self.heap = None    # верхняя карта
         self.players = None    # игроки
         self.player_index = None    # индекс текущего игрока
-        self.rule = ('red', 'старшая карта')  # верхняя карта палитры(правило игры)
+        self.rule = ('red', '')  # верхняя карта палитры(правило игры)
 
     @staticmethod
     def create(name_list: list[str], cards: list[Card] | None = None):
@@ -53,7 +54,9 @@ class RED7GAME:
             current_player.add_to_palette(card)
         else:
             # Если подходящей карты нет...
-            print('либо меняем правила либо пас')
+            print(f'{current_player.name}: либо меняет правила либо пас')
+            # self.players.pop(self.player_index)  # Выбывет игрок
+            # self.player_index = 0
             return False
 
         # после розыгрыша карт печатаем руку игрока и разделитель
@@ -105,22 +108,54 @@ class RED7GAME:
             other_palettes.extend(player.palette)
 
         other_palettes.pop(self.player_index)  # Удаляем палитру текущего игрока
-        print(other_palettes)
+        # print(other_palettes)
 
         max_card = Card.max_card(other_palettes)  # Находим максимальную карту во всех палитрах(кроме играющего)
         print('Max Card in players palettes:', max_card)
 
-        # playable_hand = self.current_player().hand
-        playable_cards = self.current_player().hand.playable_cards(max_card)  # карты которыми можо сыграть
+        playable_cards = self.current_player().hand.playable_cards_red(max_card)  # карты которыми можо сыграть
 
         return playable_cards
 
-
-
     def orange_rule(self):
-        print("Orange")
-        get_all_hands = self.players
-        print(get_all_hands)
+        print("ORANGE RULE")
+        other_palettes = []
+
+        for player in self.players:
+            """Считываем последовательности игроков"""
+            numbers = []
+            for i in player.palette:
+                numbers.append(i.number)
+            c = Counter(numbers)
+            other_palettes.append(c)
+
+        # print(next(iter(other_palettes[0].items())))
+
+        current_palette = other_palettes.pop(self.player_index)  # последовательность играющего
+        # print(current_palette)
+
+        """Наибольшая последовательность игроков"""
+        highest_palette = {1: 1}
+        for palette in other_palettes:
+            for item, value in palette.items():
+                if value > list(highest_palette.values())[0]:
+                    highest_palette = {item: value}
+                elif value == list(highest_palette.values())[0] and item > list(highest_palette.keys())[0]:
+                    highest_palette = {item: value}
+
+        # print(highest_palette, 'highest')
+
+        # highest_palette = highest_palette.items()
+        # print(highest_palette.items())
+
+        if max(current_palette.values()) - max(highest_palette.values()) < 0:
+            return []
+
+        max_number = max(current_palette.keys())
+        playable_cards = self.current_player().hand.playable_cards_orange(max_number)  # карты которыми можо сыграть
+        # print(playable_cards, 'CARDS')
+
+        return playable_cards
 
     def yellow_rule(self):
         print("yellow")
@@ -160,9 +195,6 @@ class RED7GAME:
         size = len(self.players)
         self.player_index = (self.player_index + 1) % size
 
-    def rule(self):
-        self.heap[0]
 
-
-game = RED7GAME.create(['ME', 'NOTME'])
+game = RED7GAME.create(['ME', 'NOTME', 'OTHER'])
 game.run()
