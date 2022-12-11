@@ -13,7 +13,7 @@ class RED7GAME:
         self.heap = None    # верхняя карта
         self.players = None    # игроки
         self.player_index = None    # индекс текущего игрока
-        self.rule = ('lightblue', '')  # верхняя карта палитры(правило игры)
+        self.rule = ('blue', '')  # верхняя карта палитры(правило игры)
 
     @staticmethod
     def create(name_list: list[str], cards: list[Card] | None = None):
@@ -256,9 +256,66 @@ class RED7GAME:
         return playable_cards
 
     def blue_rule(self):
-        print("blue")
-        get_all_hands = self.players
-        print(get_all_hands)
+        print("BLUE RULE")
+        other_palettes = []
+        playable_cards = []
+
+        for player in self.players:
+            palettes = []
+            for card in player.palette:
+                palettes.append(card.number)
+            other_palettes.append(palettes)
+
+        other_lengths = []
+        for cards in other_palettes:
+            k = 1
+            max_k = 0
+            lengths = []
+            if len(cards) == 1:
+                other_lengths.append([k])
+                continue
+            for i in range(0, len(cards)):
+                if cards[i-1] - cards[i] == 1:
+                    k += 1
+                if max_k < k:
+                    max_k = k
+                if cards[i-1] - cards[i] != 1:
+                    k = 0
+
+            lengths.append(max_k)
+            other_lengths.append(lengths)
+
+        # print(other_palettes)
+
+        current_palette = sorted(other_palettes.pop(self.player_index))  # Сортированная палитра игрока
+        current_length = len(other_lengths.pop(self.player_index))  # длина сортированной палитры игрока
+
+        # print(max(list(map(max, other_lengths))), "Наибольшая длина палитры соперников ")
+
+        # print(current_palette)
+        # print(current_length, 'LSLSL')
+
+        """Если длинна палитры удовл.условию больше или равно максимальной длине палитры удвл.условию то играем"""
+        if current_length >= max(list(map(max, other_lengths))):
+            palette_order = []  # Срез карт идущих последовательно в палитре
+            palette_order_2 = []
+
+            if current_length == 1:
+                playable_cards = self.current_player().hand.playable_cards_blue(current_palette[0])
+                return playable_cards
+
+            palette_order.append(current_palette[0])
+            for i in range(1, current_length-1):
+                if current_palette[i-1]-current_palette[i] == 1:
+                    palette_order.append(current_palette[i])
+                else:
+                    palette_order_2.extend(palette_order)
+                    palette_order = []
+
+            playable_cards = self.current_player().hand.playable_cards_blue(max(current_palette))
+
+        return playable_cards
+
 
     def purple_rule(self):
         print("PURPLE RULE")

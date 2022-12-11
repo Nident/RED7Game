@@ -67,6 +67,9 @@ class Hand(CardList):
     def playable_cards_lightBlue(self, current_palette):
         return [card for card in self.cards if card.playable_lightBlue(current_palette)]
 
+    def playable_cards_blue(self, current_palette):
+        return [card for card in self.cards if card.playable_blue(current_palette)]
+
     def playable_cards_purple(self):
         return [card for card in self.cards if card.playable_purple()]
 
