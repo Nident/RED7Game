@@ -21,7 +21,7 @@ class Card:
         self.number = number
 
     def __repr__(self):
-        """Возвращает сроку вида r 3"""
+        """Возвращает сроку вида r3"""
         return f"{self.color[0]}{self.number}"
 
     def __eq__(self, other):
@@ -78,8 +78,3 @@ class Card:
                 if Card.COLORS.index(max_card.color) > Card.COLORS.index(i.color):
                     max_card = i
         return max_card
-
-
-# card = Card('red', 1)
-#
-# print(card.number)

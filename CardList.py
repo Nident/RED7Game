@@ -72,10 +72,23 @@ class Hand(CardList):
 
     def playable_cards_purple(self):
         return [card for card in self.cards if card.playable_purple()]
+    
+    def possible_rules(self):
+        colors = []
+        cards = []
+        for i in self.cards:
+            if i.color not in colors:
+                colors.append(i.color)
+                cards.append(i)
 
+        return cards
 
     def remove(self, card: Card):
+        """Возвращает удаленную карту"""
         self.cards.remove(card)
+        return card
+    
+  
 
 
 

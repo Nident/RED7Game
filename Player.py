@@ -6,14 +6,8 @@ class Player:
     def __init__(self, name: str, cards: list[Card]):
         self.name = name
         self.palette = [cards[-1]]
-        # self.palette = cards[3:-1]
-
         self.hand = Hand(cards[:-1])
-        # print(self.hand)
-        # self.palette = Palette([cards[0]])
-        # print(self.hand, 'HAND IN PLAYER')
-        # print(self.first_palette_card, 'first_palette_card IN PLAYER')
-
+    
     def __repr__(self):
         return f'{self.name}: {self.hand} || {self.palette}'
 
@@ -29,8 +23,8 @@ class Player:
         return len(self.hand) == 0
 
     def add_to_palette(self, card: Card):
+        """Играем карту с руки в палитру"""
         self.palette.append(card)
         self.hand.remove(card)
-        # print(self.palette, 'Paletteeeeeeeeeeeeeeeeeeee')
 
 
