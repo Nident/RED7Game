@@ -28,8 +28,9 @@ class Deck(CardList):
         self.cards = self.cards[1:]
         return card
 
-    # random.seed(12)
+
     def shuffle(self):
+        random.seed(2)
         random.shuffle(self.cards)
 
     def __repr__(self):
@@ -51,10 +52,22 @@ class Heap(CardList):
 class Hand(CardList):
     def __init__(self, cards: list[Card]):
         super(Hand, self).__init__(cards)
+        self.current_index = 0
+        self.class_size = len(self.cards)
 
-    # def playable_cards_red(self, max_card: Card) -> list[Card]:
-    #     return [card for card in self.cards if card.playable_red(max_card)]
-    #
+    def __iter__(self):
+        # self.a = 0
+        return iter(self.cards)
+
+    # def __next__(self):
+    #     x = self.a
+    #     self.a += 1
+    #     return x
+
+    def playable_cards_red(self, max_card: Card) -> list[Card]:
+        return [card for card in self.cards if card.playable_red(max_card)]
+
+
     # def playable_cards_orange(self, max_number):
     #     return [card for card in self.cards if card.playable_orange(max_number)]
     #

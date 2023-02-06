@@ -1,6 +1,7 @@
 from RED7.src.CardList import Deck, Heap
 from RED7.src.Player import Player
 from RED7.src.Card import Card
+from RED7.src.palette import Palette
 from collections import Counter
 
 
@@ -13,7 +14,7 @@ class RED7GAME:
         self.heap = None    # верхняя карта
         self.players = None    # игроки
         self.player_index = None    # индекс текущего игрока
-        self.rule = ('blue', '')  # верхняя карта палитры(правило игры)
+        self.rule = ('red', '')  # верхняя карта палитры(правило игры)
 
     @staticmethod
     def create(name_list: list[str], cards: list[Card] | None = None):
@@ -43,7 +44,7 @@ class RED7GAME:
         current_player = self.current_player()  # игрок чей сейчас ход
         # print(self.players)
         playable_cards = []
-        # playable_cards = self.get_playable_cards(self.rule)
+        playable_cards = self.get_playable_cards(self.rule)
         # print(playable_cards, "GOT CARDS")
 
         # Если существуют карты которыми можно сыграть по данному правилу
@@ -84,33 +85,35 @@ class RED7GAME:
         cards = []
         if rule[0] == 'red':
             cards = self.red_rule()
-        elif rule[0] == 'orange':
-            cards = self.orange_rule()
-        elif rule[0] == 'yellow':
-            cards = self.yellow_rule()
-        elif rule[0] == 'green':
-            cards = self.green_rule()
-        elif rule[0] == 'lightblue':
-            cards = self.lightBlue_rule()
-        elif rule[0] == 'blue':
-            cards = self.blue_rule()
-        elif rule[0] == 'purple':
-            cards = self.purple_rule()
+        # elif rule[0] == 'orange':
+        #     cards = self.orange_rule()
+        # elif rule[0] == 'yellow':
+        #     cards = self.yellow_rule()
+        # elif rule[0] == 'green':
+        #     cards = self.green_rule()
+        # elif rule[0] == 'lightblue':
+        #     cards = self.lightBlue_rule()
+        # elif rule[0] == 'blue':
+        #     cards = self.blue_rule()
+        # elif rule[0] == 'purple':
+        #     cards = self.purple_rule()
 
         return cards
 
     def red_rule(self):
         print("RED RULE")
-        other_palettes = []
+        palettes = []
+        playable_cards = []
 
         for player in self.players:  # Собираю палитры всех игроков
-            other_palettes.extend(player.palette)
+            palettes.extend([player.palette.value_red()])
 
-        other_palettes.pop(self.player_index)  # Удаляем палитру текущего игрока
+        # ВОЗМОЖНО тут должно быть условие если в начале игы игрок изначально ведет по правилу
 
-        max_card = Card.max_card(other_palettes)  # Находим максимальную карту во всех палитрах(кроме играющего)
-
-        playable_cards = self.current_player().hand.playable_cards_red(max_card)  # карты которыми можно сыграть
+        for card in self.current_player().hand:
+            value = self.current_player().palette.new_palette(card) # Ценность каждой карты
+            if value > max(palettes):
+                playable_cards.append(card)
 
         return playable_cards
 

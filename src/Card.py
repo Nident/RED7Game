@@ -27,30 +27,33 @@ class Card:
     def __eq__(self, other):
         return self.color == other.color and self.number == other.number
 
-    def playable_red(self, max_card) -> bool:
-        """ Возвращает True, если self можно сыграть по правилу. """
-        if self.number > max_card.number:
-            return max_card
-        elif self.number == max_card.number and Card.COLORS.index(self.color) < Card.COLORS.index(max_card.color):
-            return max_card
+    def tiebreaker(self):
+        return abs(7 - self.COLORS.index(self.color))
 
-    def playable_orange(self, max_number):
-        return self.number == max_number
-
-    def playable_yellow(self, max_color):
-        return self.color == max_color
-
-    def playable_green(self):
-        return self.number % 2 == 0
-
-    def playable_lightBlue(self, current_palette):
-        return self.number not in current_palette
-
-    def playable_blue(self, current_palette):
-        return abs(self.number - current_palette) == 1
-
-    def playable_purple(self):
-        return self.number < 4
+    # def playable_red(self, max_card) -> bool:
+    #     """ Возвращает True, если self можно сыграть по правилу. """
+    #     if self.number > max_card.number:
+    #         return max_card
+    #     elif self.number == max_card.number and Card.COLORS.index(self.color) < Card.COLORS.index(max_card.color):
+    #         return max_card
+    #
+    # def playable_orange(self, max_number):
+    #     return self.number == max_number
+    #
+    # def playable_yellow(self, max_color):
+    #     return self.color == max_color
+    #
+    # def playable_green(self):
+    #     return self.number % 2 == 0
+    #
+    # def playable_lightBlue(self, current_palette):
+    #     return self.number not in current_palette
+    #
+    # def playable_blue(self, current_palette):
+    #     return abs(self.number - current_palette) == 1
+    #
+    # def playable_purple(self):
+    #     return self.number < 4
 
     @staticmethod
     def create(short_form: str):
