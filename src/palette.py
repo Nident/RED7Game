@@ -1,4 +1,4 @@
-from RED7.src.CardList import CardList
+from src.CardList import CardList
 
 
 class Palette(CardList):

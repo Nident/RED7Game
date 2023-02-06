@@ -1,6 +1,6 @@
 import random
-from RED7.Player import Player
-from RED7.Card import Card
+from src.Player import Player
+from src.Card import Card
 from random import shuffle
 
 random.seed(10)

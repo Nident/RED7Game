@@ -1,7 +1,7 @@
-from RED7.src.CardList import Deck, Heap
-from RED7.src.Player import Player
-from RED7.src.Card import Card
-from RED7.src.palette import Palette
+from src.CardList import Deck, Heap
+from src.Player import Player
+from src.Card import Card
+from src.palette import Palette
 from collections import Counter
 
 
@@ -43,9 +43,9 @@ class RED7GAME:
 
         current_player = self.current_player()  # игрок чей сейчас ход
         # print(self.players)
-        playable_cards = []
+        # playable_cards = []
         playable_cards = self.get_playable_cards(self.rule)
-        # print(playable_cards, "GOT CARDS")
+        print(playable_cards, "GOT CARDS")
 
         # Если существуют карты которыми можно сыграть по данному правилу
         if len(playable_cards):

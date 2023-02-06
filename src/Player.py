@@ -1,6 +1,6 @@
-from RED7.src.Card import Card
-from RED7.src.CardList import Hand
-from RED7.src.palette import Palette
+from src.Card import Card
+from src.CardList import Hand
+from src.palette import Palette
 
 
 class Player:

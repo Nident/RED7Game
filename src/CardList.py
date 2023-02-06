@@ -1,4 +1,4 @@
-from RED7.src.Card import Card
+from src.Card import Card
 import random
 
 
