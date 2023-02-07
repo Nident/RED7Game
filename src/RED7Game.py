@@ -14,7 +14,7 @@ class RED7GAME:
         self.heap = None    # верхняя карта
         self.players = None    # игроки
         self.player_index = None    # индекс текущего игрока
-        self.rule = ('yellow', '')  # верхняя карта палитры(правило игры)
+        self.rule = ('purple', '')  # верхняя карта палитры(правило игры)
 
     @staticmethod
     def create(name_list: list[str], cards: list[Card] | None = None):
@@ -89,14 +89,14 @@ class RED7GAME:
             cards = self.orange_rule()
         elif rule[0] == 'yellow':
             cards = self.yellow_rule()
-        # elif rule[0] == 'green':
-        #     cards = self.green_rule()
-        # elif rule[0] == 'lightblue':
-        #     cards = self.lightBlue_rule()
+        elif rule[0] == 'green':
+            cards = self.green_rule()
+        elif rule[0] == 'lightblue':
+            cards = self.lightBlue_rule()
         # elif rule[0] == 'blue':
         #     cards = self.blue_rule()
-        # elif rule[0] == 'purple':
-        #     cards = self.purple_rule()
+        elif rule[0] == 'purple':
+            cards = self.purple_rule()
 
         return cards
 
@@ -161,124 +161,88 @@ class RED7GAME:
 
     def green_rule(self):
         print("GREEN RULE")
-        other_palettes = []
+        palettes = []
         playable_cards = []
 
-        for player in self.players:
-            """Считываем последовательности номеров у игроков"""
-            for card in player.palette:
-                palettes = []
-                if card.number % 2 == 0:
-                    palettes.append(card)
-            other_palettes.append(len(palettes))
+        for player in self.players:  # Собираю палитры всех игроков
+            # print(player.palette)
+            palettes.extend([player.palette.value_green()])
 
-        current_palette = other_palettes.pop(self.player_index)
+        print(palettes)
 
-        max_equal = max(other_palettes)
-        if current_palette >= max_equal:
-            playable_cards = self.current_player().hand.playable_cards_green()
+        # ВОЗМОЖНО тут должно быть условие если в начале игы игрок изначально ведет по правилу
+
+        for card in self.current_player().hand:
+            value = self.current_player().palette.green_new_palette(card)  # Ценность каждой карты
+            if value > max(palettes):
+                # print(value, card)
+                playable_cards.append(card)
 
         return playable_cards
 
     def lightBlue_rule(self):
         print("LIGHTBLUE")
-        other_palettes = []
+        palettes = []
         playable_cards = []
 
-        for player in self.players:
-            """Считываем последовательность с разными цветами"""
-            palettes = []
-            for card in player.palette:
-                palettes.append(card.color)
-            other_palettes.append(set(palettes))
+        for player in self.players:  # Собираю палитры всех игроков
+            # print(player.palette)
+            palettes.extend([player.palette.value_lightblue()])
 
-        current_palette = other_palettes.pop(self.player_index)
-        my_max = len(current_palette)  # последовательность игрока
+        print(palettes)
 
-        # самая длинная последовательность у соперников
-        other_max = []
-        for i in other_palettes:
-            other_max.append(len(i))
+        # ВОЗМОЖНО тут должно быть условие если в начале игы игрок изначально ведет по правилу
 
-        if my_max >= max(other_max):
-            playable_cards = self.current_player().hand.playable_cards_lightBlue(current_palette)
+        print(self.current_player().hand)
+        for card in self.current_player().hand:
+            value = self.current_player().palette.lightblue_new_palette(card)  # Ценность каждой карты
+            if value > max(palettes):
+                # print(value, card)
+                playable_cards.append(card)
 
         return playable_cards
 
     def blue_rule(self):
         print("BLUE RULE")
-        other_palettes = []
+        palettes = []
         playable_cards = []
 
-        for player in self.players:
-            palettes = []
-            for card in player.palette:
-                palettes.append(card.number)
-            other_palettes.append(sorted(palettes))
+        for player in self.players:  # Собираю палитры всех игроков
+            # print(player.palette)
+            palettes.extend([player.palette.value_blue()])
 
-        # Поиск длин последовательностей всех игроков
-        other_lengths = []
-        for cards in other_palettes:
-            k = 1
-            max_k = 0
-            lengths = []
-            if len(cards) == 1:
-                other_lengths.append([k])
-                continue
-            for i in range(1, len(cards)):
-                if cards[i-1] - cards[i] == 1:
-                    k += 1
-                if max_k < k:
-                    max_k = k
-                if cards[i-1] - cards[i] != 1:
-                    k = 0
+        print(palettes)
 
-            lengths.append(max_k)
-            other_lengths.append(lengths)
+        # ВОЗМОЖНО тут должно быть условие если в начале игы игрок изначально ведет по правилу
 
-        current_palette = sorted(other_palettes.pop(self.player_index))  # Сортированная палитра игрока
-        current_length = len(other_lengths.pop(self.player_index))  # длина сортированной палитры игрока
-
-        """Если длинна палитры удовл. условию больше или равно максимальной длине палитры удовл. условию то играем"""
-        if current_length >= max(list(map(max, other_lengths))):
-            palette_order = []  # Срез карт идущих последовательно в палитре
-            palette_order_2 = []
-
-            if current_length == 1:
-                playable_cards = self.current_player().hand.playable_cards_blue(current_palette[0])
-                return playable_cards
-
-            palette_order.append(current_palette[0])
-            for i in range(1, current_length-1):
-                if current_palette[i-1]-current_palette[i] == 1:
-                    palette_order.append(current_palette[i])
-                else:
-                    palette_order_2.extend(palette_order)
-                    palette_order = []
-            
-            #  не дописал ()
-            playable_cards = self.current_player().hand.playable_cards_blue(max(current_palette))
+        print(self.current_player().hand)
+        for card in self.current_player().hand:
+            value = self.current_player().palette.blue_new_palette(card)  # Ценность каждой карты
+            if value > max(palettes):
+                # print(value, card)
+                playable_cards.append(card)
 
         return playable_cards
 
     def purple_rule(self):
         print("PURPLE RULE")
-        other_palettes = []
+        palettes = []
         playable_cards = []
 
-        for player in self.players:
-            """Считываем последовательность номиналом меньше 4 у игроков"""
-            for card in player.palette:
-                palettes = []
-                if card.number < 4:
-                    palettes.append(card)
-            other_palettes.append(len(palettes))
+        for player in self.players:  # Собираю палитры всех игроков
+            # print(player.palette)
+            palettes.extend([player.palette.value_purple()])
 
-        current_palette = other_palettes.pop(self.player_index)  # Палитра игрока
+        print(palettes)
 
-        max_less_four = max(other_palettes)
-        if current_palette >= max_less_four:
-            playable_cards = self.current_player().hand.playable_cards_purple()
+        # ВОЗМОЖНО тут должно быть условие если в начале игы игрок изначально ведет по правилу
+
+        print(self.current_player().hand)
+        for card in self.current_player().hand:
+            value = self.current_player().palette.purple_new_palette(card)  # Ценность каждой карты
+            if value > max(palettes):
+                # print(value, card)
+                playable_cards.append(card)
 
         return playable_cards
 
