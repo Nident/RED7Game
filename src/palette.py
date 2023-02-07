@@ -17,11 +17,29 @@ class Palette(CardList):
                 value = max_card_number * 100 + tiebreaker_card.tiebreaker()
         return value
 
-    def new_palette(self, card):
+    def red_new_palette(self, card):
         self.cards.append(card)
         value = self.value_red()
         self.cards.remove(card)
         return value
+
+    def value_orange(self) -> list:
+        nums = {1: [0, 0], 2: [0, 0], 3: [0, 0], 4: [0, 0], 5: [0, 0], 6: [0, 0], 7: [0, 0]}
+        for card in self.cards:
+            tiebreaker_card = card
+            nums[card.number][0] += 1
+            nums[card.number][1] += card.number * 100 + tiebreaker_card.tiebreaker()
+
+        # print(nums)
+        value = max(nums.values())
+        return value
+
+    def orange_new_palette(self, card):
+        self.cards.append(card)
+        value = self.value_orange()
+        self.cards.remove(card)
+        return value
+
 
 
 
