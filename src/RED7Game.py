@@ -14,7 +14,7 @@ class RED7GAME:
         self.heap = None    # верхняя карта
         self.players = None    # игроки
         self.player_index = None    # индекс текущего игрока
-        self.rule = ('purple', '')  # верхняя карта палитры(правило игры)
+        self.rule = ('blue', '')  # верхняя карта палитры(правило игры)
 
     @staticmethod
     def create(name_list: list[str], cards: list[Card] | None = None):
@@ -93,8 +93,8 @@ class RED7GAME:
             cards = self.green_rule()
         elif rule[0] == 'lightblue':
             cards = self.lightBlue_rule()
-        # elif rule[0] == 'blue':
-        #     cards = self.blue_rule()
+        elif rule[0] == 'blue':
+            cards = self.blue_rule()
         elif rule[0] == 'purple':
             cards = self.purple_rule()
 
