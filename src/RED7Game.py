@@ -14,7 +14,7 @@ class RED7GAME:
         self.heap = None    # верхняя карта
         self.players = None    # игроки
         self.player_index = None    # индекс текущего игрока
-        self.rule = ('orange', '')  # верхняя карта палитры(правило игры)
+        self.rule = ('yellow', '')  # верхняя карта палитры(правило игры)
 
     @staticmethod
     def create(name_list: list[str], cards: list[Card] | None = None):
@@ -87,8 +87,8 @@ class RED7GAME:
             cards = self.red_rule()
         elif rule[0] == 'orange':
             cards = self.orange_rule()
-        # elif rule[0] == 'yellow':
-        #     cards = self.yellow_rule()
+        elif rule[0] == 'yellow':
+            cards = self.yellow_rule()
         # elif rule[0] == 'green':
         #     cards = self.green_rule()
         # elif rule[0] == 'lightblue':
@@ -140,36 +140,22 @@ class RED7GAME:
 
     def yellow_rule(self):
         print("YELLOW RULE")
-        other_palettes = []
+        palettes = []
         playable_cards = []
 
-        for player in self.players:
-            """Считываем последовательности номеров у игроков"""
-            colors = []
-            for i in player.palette:
-                colors.append(i.color)
-            c = Counter(colors)
-            other_palettes.append(c)
+        for player in self.players:  # Собираю палитры всех игроков
+            # print(player.palette)
+            palettes.extend([player.palette.value_yellow()])
 
-        current_palette = other_palettes.pop(self.player_index)  # последовательность играющего
+        print(palettes)
 
-        """Наибольшая последовательность цветов у игроков"""
-        highest_palette = {'purple': 1}
-        for palette in other_palettes:
-            for item, value in palette.items():
-                if value > list(highest_palette.values())[0]:
-                    highest_palette = {item: value}
-                elif value == list(highest_palette.values())[0] \
-                        and Card.COLORS.index(item) < Card.COLORS.index(list(highest_palette.keys())[0]):
-                    highest_palette = {item: value}
-
-        """Если разница в последовательностях больше 1, 
-        то игрок не сможет за 1 ход набрать более длинную последовательность"""
-        if max(current_palette.values()) - max(highest_palette.values()) < 0:
-            return playable_cards
-
-        max_color = max(current_palette.keys())
-        playable_cards = self.current_player().hand.playable_cards_yellow(max_color)  # карты которыми можно сыграть
+        # ВОЗМОЖНО тут должно быть условие если в начале игы игрок изначально ведет по правилу
+        # print(self.current_player().hand)
+        for card in self.current_player().hand:
+            value = self.current_player().palette.yellow_new_palette(card)  # Ценность каждой карты
+            if value > max(palettes):
+                # print(value, card)
+                playable_cards.append(card)
 
         return playable_cards
 
