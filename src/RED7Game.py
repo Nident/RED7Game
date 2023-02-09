@@ -34,6 +34,7 @@ class RED7GAME:
         while is_running:
             is_running = self.turn()
         self.congratulation_winner()
+        print(self.players_value(), 'AYO')
 
     def turn(self) -> bool:
         """ Возвращает False, если игра закончена. """
@@ -41,15 +42,10 @@ class RED7GAME:
 
         current_player = self.current_player()  # игрок чей сейчас ход
 
-        # print(self.players)
-        # print([player.palette for player in self.players])
-        # print(self.players_value())
-        # print(current_player.palette)
-
         possible_plays = self.get_possible_plays(self.central_card)
         print(possible_plays, "GOT CARDS")
-
         # playable_cards = self.get_playable_cards(possible_plays)
+
         # Если существуют карты которыми можно сыграть по данному правилу
         if len(possible_plays):
             play = possible_plays[0]  # беру Первую карту
@@ -89,7 +85,11 @@ class RED7GAME:
         return possible_plays
 
     def players_value(self):
-        value = [player.palette.value(self.central_card.color) for player in self.players]
+        # value = [player.palette.value('red') for player in self.players]
+        value = []
+        for player in self.players:
+            print(player.palette, 'Trown palette')
+            value.append(player.palette.value('red'))
         # max_value = max(value)
         return value
 

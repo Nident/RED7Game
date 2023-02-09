@@ -43,6 +43,7 @@ class Palette(CardList):
     def value_red(self) -> int:
         value = 0
         max_card_number = 0
+        print(self.cards, 'IN RED VALUE;')
         for card in self.cards:
             if card.number > max_card_number:
                 max_card_number = card.number
@@ -64,7 +65,7 @@ class Palette(CardList):
     def value_yellow(self) -> list:
         nums = {'red': [0, 0], 'orange': [0, 0], 'yellow': [0, 0], 'green': [0, 0],
                 'lightBlue': [0, 0], 'blue': [0, 0], 'purple': [0, 0]}
-
+        print(self.cards, 'IN YELLOw VALUE;')
         for card in self.cards:
             tiebreaker_card = card
             nums[card.color][0] += 1
@@ -76,6 +77,7 @@ class Palette(CardList):
 
     def value_green(self) -> list:
         nums = {2: [0, 0], 4: [0, 0], 6: [0, 0]}
+        print(self.cards, 'IN GREEN VALUE;')
         for card in self.cards:
             if card.number in nums.keys():
                 tiebreaker_card = card
