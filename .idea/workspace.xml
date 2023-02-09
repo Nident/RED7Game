@@ -5,7 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78090628-72ee-4647-b0f3-8e4e36870e78" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/tests/test_palette.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Card.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Card.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CardList.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/CardList.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/RED7Game.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/RED7Game.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/palette.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/palette.py" afterDir="false" />
     </list>
@@ -13,6 +16,13 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -55,6 +65,22 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="pytest in test_palette.py" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="RED7Game" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/tests/test_palette.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
     <configuration name="pytest in test_player.py" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="RED7Game" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -74,6 +100,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.RED7Game" />
+        <item itemvalue="Python tests.pytest in test_palette.py" />
         <item itemvalue="Python tests.pytest in test_player.py" />
       </list>
     </recent_temporary>
@@ -88,5 +115,16 @@
       <updated>1675685914679</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

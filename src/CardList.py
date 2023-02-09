@@ -1,5 +1,6 @@
 from src.Card import Card
 import random
+import itertools
 
 
 class CardList:
@@ -37,16 +38,16 @@ class Deck(CardList):
         return f'{self.cards}'
 
 
-class Heap(CardList):
-    def __init__(self, cards: list[Card]):
-        super(Heap, self).__init__(cards)
-
-    def __str__(self):
-        return str(self.top())
-
-    def top(self) -> Card:
-        """ Верхняя карта """
-        return self.cards[-1]
+# class Heap(CardList):
+#     def __init__(self, cards: list[Card]):
+#         super(Heap, self).__init__(cards)
+#
+#     def __str__(self):
+#         return str(self.top())
+#
+#     def top(self) -> Card:
+#         """ Верхняя карта """
+#         return self.cards[-1]
 
 
 class Hand(CardList):
@@ -58,6 +59,9 @@ class Hand(CardList):
     def __iter__(self):
         # self.a = 0
         return iter(self.cards)
+
+    def all_card_pairs(self):
+        return list(itertools.combinations([None] + self.cards, 2))
 
     # def __next__(self):
     #     x = self.a

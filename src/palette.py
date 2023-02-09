@@ -1,5 +1,13 @@
 from src.CardList import CardList
-# from src.Card import Card
+from src.Card import Card
+
+# red: старшая карта
+# orange: больше всего карт одного номинала.
+# yellow: больше всего карт одного цвета.
+# green: больше всего чётных карт.
+# lightBlue: больше всего карт разных цветов
+# blue: больше всего карт, идущих по порядку
+# purple: больше всего карт номиналом меньше 4
 
 
 class Palette(CardList):
@@ -7,6 +15,30 @@ class Palette(CardList):
 
     def __init__(self, cards):
         super(Palette, self).__init__(cards)
+        self.value_function = {
+            'red': self.value_red(),
+            'orange': self.value_orange(),
+            'yellow': self.value_yellow(),
+            'green': self.value_green(),
+            'lightBlue': self.value_lightblue(),
+            'blue': self.value_blue(),
+            'purple': self.value_purple()
+        }
+
+    def __add__(self, card):
+        return Palette(self.cards + [card])
+
+    def value(self, color):
+        return self.value_function[color]
+
+    # def new_palette(self, card, color):
+    #     new_palette = self.cards.copy()
+    #
+    #     new_palette.append(card)
+    #     value = self.value(color)
+    #     new_palette.remove(card)
+    #
+    #     return value
 
     def value_red(self) -> int:
         value = 0
@@ -16,12 +48,6 @@ class Palette(CardList):
                 max_card_number = card.number
                 tiebreaker_card = card
                 value = max_card_number * 100 + tiebreaker_card.tiebreaker()
-        return value
-
-    def red_new_palette(self, card):
-        self.cards.append(card)
-        value = self.value_red()
-        self.cards.remove(card)
         return value
 
     def value_orange(self) -> list:
@@ -35,12 +61,6 @@ class Palette(CardList):
         value = max(nums.values())
         return value
 
-    def orange_new_palette(self, card):
-        self.cards.append(card)
-        value = self.value_orange()
-        self.cards.remove(card)
-        return value
-
     def value_yellow(self) -> list:
         nums = {'red': [0, 0], 'orange': [0, 0], 'yellow': [0, 0], 'green': [0, 0],
                 'lightBlue': [0, 0], 'blue': [0, 0], 'purple': [0, 0]}
@@ -50,14 +70,8 @@ class Palette(CardList):
             nums[card.color][0] += 1
             nums[card.color][1] = card.number * 100 + tiebreaker_card.tiebreaker()
 
-        print(nums)
+        # print(nums)
         value = max(nums.values())
-        return value
-
-    def yellow_new_palette(self, card):
-        self.cards.append(card)
-        value = self.value_yellow()
-        self.cards.remove(card)
         return value
 
     def value_green(self) -> list:
@@ -68,14 +82,8 @@ class Palette(CardList):
                 nums[card.number][0] += 1
                 nums[card.number][1] = card.number * 100 + tiebreaker_card.tiebreaker()
 
-        print(nums)
+        # print(nums)
         value = max(nums.values())
-        return value
-
-    def green_new_palette(self, card):
-        self.cards.append(card)
-        value = self.value_green()
-        self.cards.remove(card)
         return value
 
     def value_lightblue(self) -> list:
@@ -86,18 +94,12 @@ class Palette(CardList):
             nums[card.color][0] = 1
             nums[card.color][1] = card.number * 100 + tiebreaker_card.tiebreaker()
 
-        print(nums)
+        # print(nums)
 
         s = sum([a[0] for a in list(nums.values())])
         m = max([a[1] for a in list(nums.values())])
 
         value = [s, m]
-        return value
-
-    def lightblue_new_palette(self, card):
-        self.cards.append(card)
-        value = self.value_lightblue()
-        self.cards.remove(card)
         return value
 
     def value_blue(self) -> list:
@@ -106,7 +108,7 @@ class Palette(CardList):
         value = 0
         for x in range(1, len(sorted_palette)):
             tiebreaker_card = sorted_palette[x]
-            if sorted_palette[x].number - sorted_palette[x-1].number == 1:
+            if sorted_palette[x].number - sorted_palette[x - 1].number == 1:
                 value = sorted_palette[x].number * 100 + tiebreaker_card.tiebreaker()
                 k += 1
             else:
@@ -119,12 +121,6 @@ class Palette(CardList):
 
         return value
 
-    def blue_new_palette(self, card):
-        self.cards.append(card)
-        value = self.value_blue()
-        self.cards.remove(card)
-        return value
-
     def value_purple(self) -> list:
         nums = {1: [0, 0], 2: [0, 0], 3: [0, 0]}
         for card in self.cards:
@@ -133,12 +129,9 @@ class Palette(CardList):
                 nums[card.number][0] += 1
                 nums[card.number][1] = card.number * 100 + tiebreaker_card.tiebreaker()
 
-        print(nums)
+        # print(nums)
         value = max(nums.values())
         return value
 
-    def purple_new_palette(self, card):
-        self.cards.append(card)
-        value = self.value_purple()
-        self.cards.remove(card)
-        return value
+
+

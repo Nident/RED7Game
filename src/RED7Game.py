@@ -1,8 +1,6 @@
-from src.CardList import Deck, Heap
+from src.CardList import Deck
 from src.Player import Player
 from src.Card import Card
-from src.palette import Palette
-from collections import Counter
 
 
 class RED7GAME:
@@ -11,10 +9,9 @@ class RED7GAME:
 
     def __init__(self):
         self.deck = None    # колода
-        self.heap = None    # верхняя карта
         self.players = None    # игроки
         self.player_index = None    # индекс текущего игрока
-        self.rule = ('blue', '')  # верхняя карта палитры(правило игры)
+        self.central_card = Card('red', 0)  # (правило игры)
 
     @staticmethod
     def create(name_list: list[str], cards: list[Card] | None = None):
@@ -28,7 +25,7 @@ class RED7GAME:
 
         game.players = [Player(name, [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE)]) for name in name_list]
         game.player_index = 0
-        game.heap = Heap([game.deck.draw()])  # верхняя карта
+        # game.heap = Heap([game.deck.draw()])  # верхняя карта
 
         return game
 
@@ -40,25 +37,29 @@ class RED7GAME:
 
     def turn(self) -> bool:
         """ Возвращает False, если игра закончена. """
+        print(self.central_card.color)
 
         current_player = self.current_player()  # игрок чей сейчас ход
+
         # print(self.players)
+        # print([player.palette for player in self.players])
+        # print(self.players_value())
+        # print(current_player.palette)
 
-        playable_cards = self.get_playable_cards(self.rule)
-        print(playable_cards, "GOT CARDS")
+        possible_plays = self.get_possible_plays(self.central_card)
+        print(possible_plays, "GOT CARDS")
 
+        # playable_cards = self.get_playable_cards(possible_plays)
         # Если существуют карты которыми можно сыграть по данному правилу
-        if len(playable_cards):
-            card = playable_cards[0]  # беру Первую карту
-            print(f'{current_player.name}: Играет {card}')
-            current_player.add_to_palette(card)
-        else:
-            # Если подходящей карты нет...
-            # print(f'{current_player.name}: либо меняет правила либо пас')
-            # playable_cards = self.new_rule()
-            # if len(playable_cards):
-            #     print(f'{current_player.name}: Выбывает')
-            return False
+        if len(possible_plays):
+            play = possible_plays[0]  # беру Первую карту
+            print(f'{current_player.name}: Играет {play}')
+            self.central_card = play[0] if play[0] is not None else self.central_card
+            current_player.add_to_palette(play[-1])
+        # else:
+        #     # Если подходящей карты нет...
+        #     print(f'{current_player.name}: Выбывает')
+        #     return False
 
         # после розыгрыша карт печатаем руку игрока и разделитель
         print(current_player)
@@ -73,197 +74,43 @@ class RED7GAME:
 
         return True
 
-    def get_playable_cards(self, rule) -> Card:
+    def get_possible_plays(self, central_card):
         """ Возвращаем первую подходящую карту для игры по правилу(rule) или None, если подходящих карт нет. """
-        # red: старшая карта
-        # orange: больше всего карт одного номинала.
-        # yellow: больше всего карт одного цвета.
-        # green: больше всего чётных карт.
-        # lightBlue: больше всего карт разных цветов
-        # blue: больше всего карт, идущих по порядку
-        # purple: больше всего карт номиналом меньше 4
-        cards = []
-        if rule[0] == 'red':
-            cards = self.red_rule()
-        elif rule[0] == 'orange':
-            cards = self.orange_rule()
-        elif rule[0] == 'yellow':
-            cards = self.yellow_rule()
-        elif rule[0] == 'green':
-            cards = self.green_rule()
-        elif rule[0] == 'lightblue':
-            cards = self.lightBlue_rule()
-        elif rule[0] == 'blue':
-            cards = self.blue_rule()
-        elif rule[0] == 'purple':
-            cards = self.purple_rule()
+        possible_plays = []
+        player = self.current_player()
+        current_weight = player.palette.value(central_card.color)
+        all_card_pairs = player.hand.all_card_pairs()
+        for in_center, in_palette in all_card_pairs:
+            new_palette = player.palette
+            new_weight = (new_palette + in_palette).value(central_card.color)
+            if new_weight > current_weight:
+                possible_plays.append((in_center, in_palette))
 
-        return cards
+        return possible_plays
 
-    def red_rule(self):
-        print("RED RULE")
-        palettes = []
-        playable_cards = []
-
-        for player in self.players:  # Собираю палитры всех игроков
-            palettes.extend([player.palette.value_red()])
-
-        # ВОЗМОЖНО тут должно быть условие если в начале игы игрок изначально ведет по правилу
-
-        for card in self.current_player().hand:
-            value = self.current_player().palette.red_new_palette(card)  # Ценность каждой карты
-            if value > max(palettes):
-                playable_cards.append(card)
-
-        return playable_cards
-
-    def orange_rule(self):
-        print("ORANGE RULE")
-        palettes = []
-        playable_cards = []
-
-        for player in self.players:  # Собираю палитры всех игроков
-            # print(player.palette)
-            palettes.extend([player.palette.value_orange()])
-
-        print(palettes)
-
-        # ВОЗМОЖНО тут должно быть условие если в начале игы игрок изначально ведет по правилу
-        # print(self.current_player().hand)
-        for card in self.current_player().hand:
-            value = self.current_player().palette.orange_new_palette(card)  # Ценность каждой карты
-            if value > max(palettes):
-                # print(value, card)
-                playable_cards.append(card)
-
-        return playable_cards
-
-    def yellow_rule(self):
-        print("YELLOW RULE")
-        palettes = []
-        playable_cards = []
-
-        for player in self.players:  # Собираю палитры всех игроков
-            # print(player.palette)
-            palettes.extend([player.palette.value_yellow()])
-
-        print(palettes)
-
-        # ВОЗМОЖНО тут должно быть условие если в начале игы игрок изначально ведет по правилу
-        # print(self.current_player().hand)
-        for card in self.current_player().hand:
-            value = self.current_player().palette.yellow_new_palette(card)  # Ценность каждой карты
-            if value > max(palettes):
-                # print(value, card)
-                playable_cards.append(card)
-
-        return playable_cards
-
-    def green_rule(self):
-        print("GREEN RULE")
-        palettes = []
-        playable_cards = []
-
-        for player in self.players:  # Собираю палитры всех игроков
-            # print(player.palette)
-            palettes.extend([player.palette.value_green()])
-
-        print(palettes)
-
-        # ВОЗМОЖНО тут должно быть условие если в начале игы игрок изначально ведет по правилу
-
-        for card in self.current_player().hand:
-            value = self.current_player().palette.green_new_palette(card)  # Ценность каждой карты
-            if value > max(palettes):
-                # print(value, card)
-                playable_cards.append(card)
-
-        return playable_cards
-
-    def lightBlue_rule(self):
-        print("LIGHTBLUE")
-        palettes = []
-        playable_cards = []
-
-        for player in self.players:  # Собираю палитры всех игроков
-            # print(player.palette)
-            palettes.extend([player.palette.value_lightblue()])
-
-        print(palettes)
-
-        # ВОЗМОЖНО тут должно быть условие если в начале игы игрок изначально ведет по правилу
-
-        print(self.current_player().hand)
-        for card in self.current_player().hand:
-            value = self.current_player().palette.lightblue_new_palette(card)  # Ценность каждой карты
-            if value > max(palettes):
-                # print(value, card)
-                playable_cards.append(card)
-
-        return playable_cards
-
-    def blue_rule(self):
-        print("BLUE RULE")
-        palettes = []
-        playable_cards = []
-
-        for player in self.players:  # Собираю палитры всех игроков
-            # print(player.palette)
-            palettes.extend([player.palette.value_blue()])
-
-        print(palettes)
-
-        # ВОЗМОЖНО тут должно быть условие если в начале игы игрок изначально ведет по правилу
-
-        print(self.current_player().hand)
-        for card in self.current_player().hand:
-            value = self.current_player().palette.blue_new_palette(card)  # Ценность каждой карты
-            if value > max(palettes):
-                # print(value, card)
-                playable_cards.append(card)
-
-        return playable_cards
-
-    def purple_rule(self):
-        print("PURPLE RULE")
-        palettes = []
-        playable_cards = []
-
-        for player in self.players:  # Собираю палитры всех игроков
-            # print(player.palette)
-            palettes.extend([player.palette.value_purple()])
-
-        print(palettes)
-
-        # ВОЗМОЖНО тут должно быть условие если в начале игы игрок изначально ведет по правилу
-
-        print(self.current_player().hand)
-        for card in self.current_player().hand:
-            value = self.current_player().palette.purple_new_palette(card)  # Ценность каждой карты
-            if value > max(palettes):
-                # print(value, card)
-                playable_cards.append(card)
-
-        return playable_cards
+    def players_value(self):
+        value = [player.palette.value(self.central_card.color) for player in self.players]
+        # max_value = max(value)
+        return value
 
     def new_rule(self):
         """Изменяем правила игры если это возможно иначе []"""
-        current_palette = self.current_player().palette
-        possible_rules = self.current_player().hand.possible_rules()
-        playable_cards = []
-
-        for i in possible_rules:
-            rule = i.color
-            removed = self.current_player().hand.remove(i)  # Удаляем карту которой изменяем правила
-
-            playable_cards = self.get_playable_cards(rule)
-            self.current_player().hand.add(removed)  # Добавляем обратно
-            if len(playable_cards) != 0:
-                self.rule = rule
-                print(playable_cards, 'aaaaaaaaaaaaaaaaaa')
-
-        print(playable_cards, "AAAAAAAAa")
-        return playable_cards
+        # current_palette = self.current_player().palette
+        # possible_rules = self.current_player().hand.possible_rules()
+        # playable_cards = []
+        #
+        # for i in possible_rules:
+        #     rule = i.color
+        #     removed = self.current_player().hand.remove(i)  # Удаляем карту которой изменяем правила
+        #
+        #     playable_cards = self.get_playable_cards(rule)
+        #     self.current_player().hand.add(removed)  # Добавляем обратно
+        #     if len(playable_cards) != 0:
+        #         self.rule = rule
+        #         print(playable_cards, 'aaaaaaaaaaaaaaaaaa')
+        #
+        # print(playable_cards, "AAAAAAAAa")
+        return
 
     def congratulation_winner(self):
         print(f'Поздравляем, {self.current_player().name} выиграл!')

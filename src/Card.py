@@ -14,7 +14,7 @@ class Card:
     def __init__(self, color: str, number: int):
         if color not in Card.COLORS:
             raise ValueError(f'Invalid color <{color}>')
-        if number not in Card.NUMBERS:
+        if number not in Card.NUMBERS and number != 0:
             raise ValueError(f'Invalid number <{number}>')
 
         self.color = color
