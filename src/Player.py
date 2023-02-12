@@ -4,10 +4,11 @@ from src.palette import Palette
 
 
 class Player:
-    def __init__(self, name: str, for_hand: list[Card], for_palette: list[Card]):
+    def __init__(self, name: str, for_hand: list[Card], for_palette: list[Card], ai: bool):
         self.name = name
         self.palette = Palette(for_palette)
         self.hand = Hand(for_hand)
+        self.AI = ai
     
     def __repr__(self):
         return f'{self.name}: {self.hand} || {self.palette}'
