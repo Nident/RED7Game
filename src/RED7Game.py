@@ -9,10 +9,42 @@ class RED7GAME:
     HAND_SIZE = 7
 
     def __init__(self):
-        self.deck = None    # колода
-        self.players = None    # игроки
-        self.player_index = None    # индекс текущего игрока
-        self.central_card = Card('red', 0)  # (правило игры)
+        self.__deck = None    # колода
+        self.__players = None    # игроки
+        self.__player_index = None    # индекс текущего игрока
+        self.__central_card = Card('red', 0)  # (правило игры)
+
+    @property
+    def deck(self):
+        return self.__deck
+
+    @deck.setter
+    def deck(self, d: Deck):
+        self.__deck = d
+
+    @property
+    def players(self):
+        return self.__players
+
+    @players.setter
+    def players(self, p: Player):
+        self.__players = p
+
+    @property
+    def player_index(self):
+        return self.__player_index
+
+    @player_index.setter
+    def player_index(self, i: int):
+        self.__player_index = i
+
+    @property
+    def central_card(self):
+        return self.__central_card
+
+    @central_card.setter
+    def central_card(self, card: Card):
+        self.__central_card = card
 
     @staticmethod
     def create(name_list: list[tuple[str, bool]], cards: list[Card] | None = None):
@@ -45,7 +77,7 @@ class RED7GAME:
         is_running = True
         while is_running:
             is_running = self.turn()
-        self.player_index = 0
+        self.__player_index = 0
         self.congratulation_winner()
 
     def turn(self) -> bool:

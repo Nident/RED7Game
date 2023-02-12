@@ -15,7 +15,7 @@ class Palette(CardList):
 
     def __init__(self, cards):
         super(Palette, self).__init__(cards)
-        self.value_function = {
+        self.__value_function = {
             'red': self.value_red,
             'orange': self.value_orange,
             'yellow': self.value_yellow,
@@ -30,7 +30,7 @@ class Palette(CardList):
 
     def value(self, color: str) -> list:
         # print(self.value_function, 'SELF VALUE')
-        return self.value_function[color]()
+        return self.__value_function[color]()
 
     def new_palette(self, card: Card):
         new_palette = self.cards.copy()

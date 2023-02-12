@@ -10,8 +10,16 @@ class Card:
         if number not in Card.NUMBERS and number != 0:
             raise ValueError(f'Invalid number <{number}>')
 
-        self.color = color
-        self.number = number
+        self.__color = color
+        self.__number = number
+
+    @property
+    def color(self):
+        return self.__color
+
+    @property
+    def number(self):
+        return self.__number
 
     def __repr__(self):
         """Возвращает сроку вида r3"""

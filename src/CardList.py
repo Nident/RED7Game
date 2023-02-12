@@ -6,7 +6,15 @@ import itertools
 class CardList:
 
     def __init__(self, cards: list[Card]):
-        self.cards = cards
+        self.__cards = cards
+
+    @property
+    def cards(self):
+        return self.__cards
+
+    @cards.setter
+    def cards(self, cards: list[Card]):
+        self.__cards = cards
 
     def __repr__(self):
         return ' '.join([str(card) for card in self.cards])
@@ -36,6 +44,7 @@ class Deck(CardList):
     def __repr__(self):
         return f'{self.cards}'
 
+
 class Hand(CardList):
     def __init__(self, cards: list[Card]):
         super(Hand, self).__init__(cards)
@@ -49,8 +58,8 @@ class Hand(CardList):
     def all_card_pairs(self) -> list:
         return list(itertools.combinations([None] + self.cards, 2))
 
-    def playable_cards_red(self, max_card: Card) -> list[Card]:
-        return [card for card in self.cards if card.playable_red(max_card)]
+    # def playable_cards_red(self, max_card: Card) -> list[Card]:
+    #     return [card for card in self.cards if card.playable_red(max_card)]
 
     def remove(self, card: Card) -> Card:
         """Возвращает удаленную карту"""
