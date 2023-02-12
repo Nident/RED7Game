@@ -43,7 +43,6 @@ class Palette(CardList):
     def value_red(self) -> int:
         value = 0
         max_card_number = 0
-        print(self.cards, 'IN RED VALUE;')
         for card in self.cards:
             if card.number > max_card_number:
                 max_card_number = card.number
@@ -58,34 +57,32 @@ class Palette(CardList):
             nums[card.number][0] += 1
             nums[card.number][1] = card.number * 100 + tiebreaker_card.tiebreaker()
 
-        # print(nums)
         value = max(nums.values())
         return value
 
     def value_yellow(self) -> list:
         nums = {'red': [0, 0], 'orange': [0, 0], 'yellow': [0, 0], 'green': [0, 0],
                 'lightBlue': [0, 0], 'blue': [0, 0], 'purple': [0, 0]}
-        print(self.cards, 'IN YELLOw VALUE;')
         for card in self.cards:
             tiebreaker_card = card
             nums[card.color][0] += 1
             nums[card.color][1] = card.number * 100 + tiebreaker_card.tiebreaker()
 
-        # print(nums)
         value = max(nums.values())
         return value
 
     def value_green(self) -> list:
         nums = {2: [0, 0], 4: [0, 0], 6: [0, 0]}
-        print(self.cards, 'IN GREEN VALUE;')
         for card in self.cards:
             if card.number in nums.keys():
                 tiebreaker_card = card
                 nums[card.number][0] += 1
                 nums[card.number][1] = card.number * 100 + tiebreaker_card.tiebreaker()
 
-        # print(nums)
-        value = max(nums.values())
+        count = sum([a[0] for a in nums.values()])
+        score = max([a[1] for a in nums.values()])
+        value = [count, score]
+
         return value
 
     def value_lightblue(self) -> list:
@@ -96,12 +93,10 @@ class Palette(CardList):
             nums[card.color][0] = 1
             nums[card.color][1] = card.number * 100 + tiebreaker_card.tiebreaker()
 
-        # print(nums)
+        count = sum([a[0] for a in list(nums.values())])
+        score = max([a[1] for a in list(nums.values())])
 
-        s = sum([a[0] for a in list(nums.values())])
-        m = max([a[1] for a in list(nums.values())])
-
-        value = [s, m]
+        value = [count, score]
         return value
 
     def value_blue(self) -> list:
@@ -118,9 +113,7 @@ class Palette(CardList):
 
         if len(self.cards) == 1:
             value = self.cards[0].number * 100 + self.cards[0].tiebreaker()
-
         value = [k, value]
-
         return value
 
     def value_purple(self) -> list:
@@ -131,8 +124,10 @@ class Palette(CardList):
                 nums[card.number][0] += 1
                 nums[card.number][1] = card.number * 100 + tiebreaker_card.tiebreaker()
 
-        # print(nums)
-        value = max(nums.values())
+        count = sum([a[0] for a in nums.values()])
+        score = max([a[1] for a in nums.values()])
+
+        value = [count, score]
         return value
 
 

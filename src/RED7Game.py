@@ -23,10 +23,21 @@ class RED7GAME:
         else:
             game.deck = Deck(cards)
 
-        game.players = [Player(name, [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE)]) for name in name_list]
+        game.players = [Player(name, [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE - 1)], [game.deck.draw()])
+                        for name in name_list]
         game.player_index = 0
         # game.heap = Heap([game.deck.draw()])  # верхняя карта
 
+        return game
+
+    @staticmethod
+    def load(state: dict):
+        game = RED7GAME()
+        game.deck = Deck(Card.list_from_str(state['deck']))
+
+        game.players = [Player(p['name'], Card.list_from_str(p['hand']), Card.list_from_str(p['palette']))
+                        for p in state['players']]
+        game.player_index = state['player_index']
         return game
 
     def run(self):
@@ -34,11 +45,9 @@ class RED7GAME:
         while is_running:
             is_running = self.turn()
         self.congratulation_winner()
-        print(self.players_value(), 'AYO')
 
     def turn(self) -> bool:
         """ Возвращает False, если игра закончена. """
-        print(self.central_card.color)
 
         current_player = self.current_player()  # игрок чей сейчас ход
 
@@ -88,8 +97,7 @@ class RED7GAME:
         # value = [player.palette.value('red') for player in self.players]
         value = []
         for player in self.players:
-            print(player.palette, 'Trown palette')
-            value.append(player.palette.value('red'))
+            value.append(player.palette.value_red())
         # max_value = max(value)
         return value
 
@@ -123,6 +131,24 @@ class RED7GAME:
         """ Ход переходит к следующему игроку. """
         size = len(self.players)
         self.player_index = (self.player_index + 1) % size
+
+
+game_state = {
+    'deck': 'y1 r2 y0 y1',
+    'players': [
+        {
+            'name': 'Bob',
+            'hand': 'r3 r5',
+            'palette': 'y4 p2'
+        },
+        {
+            'name': 'Charley',
+            'hand': 'b1 g2',
+            'palette': 'l5 p6'
+        }
+    ],
+    'player_index': 0
+}
 
 
 game = RED7GAME.create(['ME', 'NOTME', 'OTHER'])

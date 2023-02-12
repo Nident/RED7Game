@@ -29,7 +29,6 @@ class Deck(CardList):
         self.cards = self.cards[1:]
         return card
 
-
     def shuffle(self):
         random.seed(2)
         random.shuffle(self.cards)
