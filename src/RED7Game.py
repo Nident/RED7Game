@@ -45,6 +45,7 @@ class RED7GAME:
         is_running = True
         while is_running:
             is_running = self.turn()
+        self.player_index = 0
         self.congratulation_winner()
 
     def turn(self) -> bool:
@@ -73,7 +74,10 @@ class RED7GAME:
         else:
             # Если подходящей карты нет...
             print(f'{current_player.name}: Выбывает')
-            return False
+            self.players.remove(current_player)
+            self.player_index -= 1
+            if len(self.players) == 1:
+                return False
 
         # после розыгрыша карт печатаем руку игрока и разделитель
         print(current_player)
@@ -152,5 +156,5 @@ game_state = {
 }
 
 
-game = RED7GAME.create([('ME', False), ('NOTME', True), ('OTHER', True)])
+game = RED7GAME.create([('ME', True), ('NOTME', True), ('OTHER', True)])
 game.run()
