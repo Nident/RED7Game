@@ -2,13 +2,6 @@
 class Card:
     COLORS = ['red', 'orange', 'yellow', 'green', 'lightBlue', 'blue', 'purple']
     NUMBERS = list(range(1, 8))
-
-    # COLORSnRULES = [('red', 'старшая карта'), ('orange', 'больше всего карт одного номинала'),
-    #                 ('yellow', 'больше всего карт одного цвета'), ('green', 'больше всего чтных карт'),
-    #                 ('lightBlue', ' больше всего карт разных цветов'),
-    #                 ('blue', ' больше всего карт, идущих по порядку'),
-    #                 ('purple', 'больше всего карт номиналом меньше 4')]
-
     SHORT_FORM = {color[0]: color for color in COLORS}
 
     def __init__(self, color: str, number: int):
@@ -29,31 +22,6 @@ class Card:
 
     def tiebreaker(self):
         return abs(7 - self.COLORS.index(self.color))
-
-    # def playable_red(self, max_card) -> bool:
-    #     """ Возвращает True, если self можно сыграть по правилу. """
-    #     if self.number > max_card.number:
-    #         return max_card
-    #     elif self.number == max_card.number and Card.COLORS.index(self.color) < Card.COLORS.index(max_card.color):
-    #         return max_card
-    #
-    # def playable_orange(self, max_number):
-    #     return self.number == max_number
-    #
-    # def playable_yellow(self, max_color):
-    #     return self.color == max_color
-    #
-    # def playable_green(self):
-    #     return self.number % 2 == 0
-    #
-    # def playable_lightBlue(self, current_palette):
-    #     return self.number not in current_palette
-    #
-    # def playable_blue(self, current_palette):
-    #     return abs(self.number - current_palette) == 1
-    #
-    # def playable_purple(self):
-    #     return self.number < 4
 
     @staticmethod
     def create(short_form: str):

@@ -50,21 +50,25 @@ class RED7GAME:
         """ Возвращает False, если игра закончена. """
 
         current_player = self.current_player()  # игрок чей сейчас ход
-
         possible_plays = self.get_possible_plays(self.central_card)
         print(possible_plays, "GOT CARDS")
-        # playable_cards = self.get_playable_cards(possible_plays)
 
+        playable_cards = self.get_playable_cards(possible_plays)
+
+        print(playable_cards, 'it could be playeed')
+
+        # playable_cards = self.get_playable_cards(possible_plays)
+        print(self.players_value(self.central_card.color))
         # Если существуют карты которыми можно сыграть по данному правилу
-        if len(possible_plays):
-            play = possible_plays[0]  # беру Первую карту
+        if len(playable_cards):
+            play = playable_cards[1]  # беру Первую карту
             print(f'{current_player.name}: Играет {play}')
             self.central_card = play[0] if play[0] is not None else self.central_card
             current_player.add_to_palette(play[-1])
-        # else:
-        #     # Если подходящей карты нет...
-        #     print(f'{current_player.name}: Выбывает')
-        #     return False
+        else:
+            # Если подходящей карты нет...
+            print(f'{current_player.name}: Выбывает')
+            return False
 
         # после розыгрыша карт печатаем руку игрока и разделитель
         print(current_player)
@@ -79,12 +83,13 @@ class RED7GAME:
 
         return True
 
-    def get_possible_plays(self, central_card):
+    def get_possible_plays(self, central_card: Card) -> list:
         """ Возвращаем первую подходящую карту для игры по правилу(rule) или None, если подходящих карт нет. """
         possible_plays = []
         player = self.current_player()
         current_weight = player.palette.value(central_card.color)
         all_card_pairs = player.hand.all_card_pairs()
+
         for in_center, in_palette in all_card_pairs:
             new_palette = player.palette
             new_weight = (new_palette + in_palette).value(central_card.color)
@@ -93,32 +98,21 @@ class RED7GAME:
 
         return possible_plays
 
-    def players_value(self):
-        # value = [player.palette.value('red') for player in self.players]
-        value = []
-        for player in self.players:
-            value.append(player.palette.value_red())
-        # max_value = max(value)
-        return value
+    def get_playable_cards(self, possible_plays: list) -> list:
+        playable = []
+        for in_center, in_palette in possible_plays:
+            new_palette = self.current_player().palette.new_palette(in_palette)
+            in_center = in_center if in_center is not None else self.central_card
+            new_palette_value = new_palette.value(in_center.color)
+            if new_palette_value > max(self.players_value(in_center.color)):
+                in_center = None if in_center is self.central_card else in_center
+                playable.append((in_center, in_palette))
 
-    def new_rule(self):
-        """Изменяем правила игры если это возможно иначе []"""
-        # current_palette = self.current_player().palette
-        # possible_rules = self.current_player().hand.possible_rules()
-        # playable_cards = []
-        #
-        # for i in possible_rules:
-        #     rule = i.color
-        #     removed = self.current_player().hand.remove(i)  # Удаляем карту которой изменяем правила
-        #
-        #     playable_cards = self.get_playable_cards(rule)
-        #     self.current_player().hand.add(removed)  # Добавляем обратно
-        #     if len(playable_cards) != 0:
-        #         self.rule = rule
-        #         print(playable_cards, 'aaaaaaaaaaaaaaaaaa')
-        #
-        # print(playable_cards, "AAAAAAAAa")
-        return
+        return playable
+
+    def players_value(self, color: str) -> list:
+        value = [player.palette.value(color) for player in self.players]
+        return value
 
     def congratulation_winner(self):
         print(f'Поздравляем, {self.current_player().name} выиграл!')

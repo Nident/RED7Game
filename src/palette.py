@@ -16,29 +16,26 @@ class Palette(CardList):
     def __init__(self, cards):
         super(Palette, self).__init__(cards)
         self.value_function = {
-            'red': self.value_red(),
-            'orange': self.value_orange(),
-            'yellow': self.value_yellow(),
-            'green': self.value_green(),
-            'lightBlue': self.value_lightblue(),
-            'blue': self.value_blue(),
-            'purple': self.value_purple()
+            'red': self.value_red,
+            'orange': self.value_orange,
+            'yellow': self.value_yellow,
+            'green': self.value_green,
+            'lightBlue': self.value_lightblue,
+            'blue': self.value_blue,
+            'purple': self.value_purple
         }
 
     def __add__(self, card):
         return Palette(self.cards + [card])
 
-    def value(self, color):
-        return self.value_function[color]
+    def value(self, color: str) -> list:
+        # print(self.value_function, 'SELF VALUE')
+        return self.value_function[color]()
 
-    # def new_palette(self, card, color):
-    #     new_palette = self.cards.copy()
-    #
-    #     new_palette.append(card)
-    #     value = self.value(color)
-    #     new_palette.remove(card)
-    #
-    #     return value
+    def new_palette(self, card: Card):
+        new_palette = self.cards.copy()
+        new_palette.append(card)
+        return Palette(new_palette)
 
     def value_red(self) -> int:
         value = 0
