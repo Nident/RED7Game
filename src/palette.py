@@ -25,11 +25,20 @@ class Palette(CardList):
             'purple': self.value_purple
         }
 
+        self.__score_function = {
+            'red': self.score_red,
+            'orange': self.score_orange,
+            'yellow': self.score_yellow,
+            'green': self.score_green,
+            'lightBlue': self.score_lightblue,
+            'blue': self.score_blue,
+            'purple': self.score_purple
+        }
+
     def __add__(self, card):
         return Palette(self.cards + [card])
 
     def value(self, color: str) -> list:
-        # print(self.value_function, 'SELF VALUE')
         return self.__value_function[color]()
 
     def new_palette(self, card: Card):
@@ -37,7 +46,7 @@ class Palette(CardList):
         new_palette.append(card)
         return Palette(new_palette)
 
-    def value_red(self) -> int:
+    def value_red(self) -> list:
         value = 0
         max_card_number = 0
         for card in self.cards:
@@ -45,7 +54,7 @@ class Palette(CardList):
                 max_card_number = card.number
                 tiebreaker_card = card
                 value = max_card_number * 100 + tiebreaker_card.tiebreaker()
-        return value
+        return [value]
 
     def value_orange(self) -> list:
         nums = {1: [0, 0], 2: [0, 0], 3: [0, 0], 4: [0, 0], 5: [0, 0], 6: [0, 0], 7: [0, 0]}
@@ -127,5 +136,78 @@ class Palette(CardList):
         value = [count, score]
         return value
 
+    def score_count(self, color):
+        return self.__score_function[color]()
 
+    def score_red(self) -> int:
+        m = max(card.number for card in self.cards)
+        score = sum(card.number for card in self.cards if card.number == m)
+        return score
+
+    def score_orange(self) -> int:
+        nums = {1: [0, 0], 2: [0, 0], 3: [0, 0], 4: [0, 0], 5: [0, 0], 6: [0, 0], 7: [0, 0]}
+        for card in self.cards:
+            nums[card.number][0] += 1
+            nums[card.number][1] += card.number
+
+        score = sum(s for c, s in nums.values() if c > 1)
+        if score == 0:
+            score = max(nums.values())[1]
+        return score
+
+    def score_yellow(self) -> int:
+        nums = {'red': [0, 0], 'orange': [0, 0], 'yellow': [0, 0], 'green': [0, 0],
+                'lightBlue': [0, 0], 'blue': [0, 0], 'purple': [0, 0]}
+        for card in self.cards:
+            nums[card.color][0] += 1
+            nums[card.color][1] += card.number
+
+        score = sum(s for c, s in nums.values() if c > 1)
+        if score == 0:
+            score = max(nums.values())[1]
+        return score
+
+    def score_green(self) -> int:
+        score = 0
+        for card in self.cards:
+            if card.number % 2 == 0:
+                score += card.number
+        return score
+
+    def score_lightblue(self) -> int:
+        nums = {'red': [0, 0], 'orange': [0, 0], 'yellow': [0, 0], 'green': [0, 0],
+                'lightBlue': [0, 0], 'blue': [0, 0], 'purple': [0, 0]}
+        for card in self.cards:
+            nums[card.color][0] = 1
+            if nums[card.color][1] < card.number:
+                nums[card.color][1] = card.number
+
+        score = sum([s for c, s in list(nums.values())])
+
+        return score
+
+    def score_blue(self) -> int:
+        if len(self.cards) == 1:
+            return self.cards[0].number
+
+        sorted_palette = sorted(self.cards, key=lambda x: (x.number, x.color))
+        s1 = sorted_palette[0].number
+        s2 = 0
+        for x in range(1, len(sorted_palette)):
+            if sorted_palette[x].number - sorted_palette[x - 1].number == 1:
+                s1 += sorted_palette[x].number
+            else:
+                s2 = s1
+                s1 = sorted_palette[x].number
+
+        score = max(s1, s2)
+        return score
+
+    def score_purple(self) -> int:
+        score = 0
+        for card in self.cards:
+            if card.number < 4:
+                score += card.number
+
+        return score
 

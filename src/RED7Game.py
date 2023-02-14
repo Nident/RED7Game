@@ -12,7 +12,9 @@ class RED7GAME:
         self.__deck = None    # колода
         self.__players = None    # игроки
         self.__player_index = None    # индекс текущего игрока
-        self.__central_card = Card('red', 0)  # (правило игры)
+        self.__central_card = Card('red', 0)  #
+        self.__advanced = None
+        self.__round = 1
 
     @property
     def deck(self):
@@ -46,8 +48,27 @@ class RED7GAME:
     def central_card(self, card: Card):
         self.__central_card = card
 
+    @property
+    def advanced(self):
+        return self.__advanced
+
+    @advanced.setter
+    def advanced(self, a: bool):
+        self.__advanced = a
+
+    @property
+    def round(self):
+        return self.__round
+
+    @round.setter
+    def round(self, r: int):
+        if r not in list(range(0, 20)):
+            print('Invalid value')
+        else:
+            self.__round = r
+
     @staticmethod
-    def create(name_list: list[tuple[str, bool]], cards: list[Card] | None = None):
+    def create(advanced, name_list: list[tuple[str, bool]], cards: list[Card] | None = None):
         """Создаю игру"""
         game = RED7GAME()
         if cards is None:
@@ -56,10 +77,10 @@ class RED7GAME:
         else:
             game.deck = Deck(cards)
 
-        game.players = [Player(name, [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE - 1)], [game.deck.draw()], ai)
-                        for name, ai in name_list]
+        game.players = [Player(name, [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE - 1)],
+                               [game.deck.draw()], ai) for name, ai in name_list]
         game.player_index = 0
-        # game.heap = Heap([game.deck.draw()])  # верхняя карта
+        game.advanced = advanced
 
         return game
 
@@ -68,9 +89,12 @@ class RED7GAME:
         game = RED7GAME()
         game.deck = Deck(Card.list_from_str(state['deck']))
 
-        game.players = [Player(p['name'], Card.list_from_str(p['hand']), Card.list_from_str(p['palette']), p['ai'])
-                        for p in state['players']]
+        game.players = [Player(p['name'], Card.list_from_str(p['hand']),
+                               Card.list_from_str(p['palette']), p['ai'], p['score']) for p in state['players']]
+
         game.player_index = state['player_index']
+        game.central_card = state['central_card']
+        game.round = state['round']
         return game
 
     def run(self):
@@ -79,9 +103,10 @@ class RED7GAME:
             is_running = self.turn()
         self.__player_index = 0
         self.congratulation_winner()
+        self.add_scores()
 
     def turn(self) -> bool:
-        print(self.central_card.color)
+        # print(self.central_card.color)
         """ Возвращает False, если игра закончена. """
 
         current_player = self.current_player()  # игрок чей сейчас ход
@@ -89,20 +114,28 @@ class RED7GAME:
         possible_plays = self.get_possible_plays(self.central_card)
         playable_cards = self.get_playable_cards(possible_plays)
 
-        print(playable_cards, 'it could be playeed')
+        # print(playable_cards, 'it could be playeed')
 
         # Если существуют карты которыми можно сыграть по данному правилу
         if len(playable_cards):
             if current_player.AI:
                 r = random.randint(0, len(playable_cards)-1)
-                play = playable_cards[r]  # беру Первую карту
+                in_center, in_palette = playable_cards[r]  # беру любую карту
             else:
                 index = int(input('What to play?: \n'))
-                play = playable_cards[index-1]
+                in_center, in_palette = playable_cards[index-1]
 
-            print(f'{current_player.name}: Играет {play}')
-            self.central_card = play[0] if play[0] is not None else self.central_card
-            current_player.add_to_palette(play[-1])
+            print(f'{current_player.name}: Играет {in_palette}')
+            take_one = False
+            if in_center is not None:
+                take_one = True if in_center.number > len(current_player.palette) else False
+                self.central_card = in_center
+
+            current_player.add_to_palette(in_palette)
+
+            if take_one:
+                new_card = self.deck.draw()
+                current_player.hand.add(new_card)
         else:
             # Если подходящей карты нет...
             print(f'{current_player.name}: Выбывает')
@@ -156,7 +189,12 @@ class RED7GAME:
         return value
 
     def congratulation_winner(self):
+        self.round += 1
         print(f'Поздравляем, {self.current_player().name} выиграл!')
+
+    def add_scores(self):
+        player = self.current_player
+        player.score = player.palette.score_count(self.central_card.color)
 
     def current_player(self):
         """Текущий игрок"""
@@ -175,18 +213,22 @@ game_state = {
             'name': 'Bob',
             'ai': True,
             'hand': 'r3 r5',
-            'palette': 'y4 p2'
+            'palette': 'y4 p2',
+            'score': 0
         },
         {
             'name': 'Charley',
             'ai': False,
             'hand': 'b1 g2',
-            'palette': 'l5 p6'
+            'palette': 'l5 p6',
+            'score': 0
         }
     ],
-    'player_index': 0
+    'player_index': 0,
+    'central_card': Card('red', 0),
+    'round': 0
 }
 
 
-game = RED7GAME.create([('ME', True), ('NOTME', True), ('OTHER', True)])
+game = RED7GAME.create(False, [('ME', True), ('NOTME', True), ('OTHER', True)])
 game.run()
