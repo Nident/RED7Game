@@ -3,6 +3,8 @@ from src.CardList import Deck
 from src.Player import Player
 from src.Card import Card
 
+random.seed(10)
+
 
 class RED7GAME:
 
@@ -15,6 +17,8 @@ class RED7GAME:
         self.__central_card = Card('red', 0)  #
         self.__advanced = None
         self.__round = 1
+        self.__game_over = None
+        self.__lost_players = []
 
     @property
     def deck(self):
@@ -67,6 +71,22 @@ class RED7GAME:
         else:
             self.__round = r
 
+    @property
+    def game_over(self):
+        return self.__game_over
+
+    @game_over.setter
+    def game_over(self, g: bool):
+        self.__game_over = g
+
+    @property
+    def lost_players(self):
+        return self.__lost_players
+
+    @lost_players.setter
+    def lost_players(self, lp: list):
+        self.__lost_players = lp
+
     @staticmethod
     def create(advanced, name_list: list[tuple[str, bool]], cards: list[Card] | None = None):
         """Создаю игру"""
@@ -97,13 +117,67 @@ class RED7GAME:
         game.round = state['round']
         return game
 
+    @staticmethod
+    def new_game(new_game_state: dict):
+        """Создаю новую игру"""
+        game = RED7GAME()
+        game.deck = Deck(Card.all_cards())  # Создаем колоду
+        game.deck.shuffle()
+
+        game.players = [Player(p['name'], [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE - 1)],
+                               [game.deck.draw()], p['ai'], p['score'])
+                        for p in new_game_state['lost_players'] + new_game_state['players']]
+
+        game.player_index = 0
+        game.advanced = new_game_state['advanced']
+        game.game_over = new_game_state['game_over']
+
+        return game
+
+    def save(self) -> dict:
+        save_dict = {
+            'deck': self.deck,
+            'players': [
+                {
+                    'name': player.name,
+                    'ai': player.AI,
+                    'hand': player.hand,
+                    'palette': player.palette,
+                    'score': player.score
+                }
+                for player in self.players
+            ],
+            'player_index': self.player_index,
+            'central_card': self.central_card,
+            'round': self.round,
+            'advanced': self.advanced,
+            'lost_players': [
+                {
+                    'name': player.name,
+                    'ai': player.AI,
+                    'hand': player.hand,
+                    'palette': player.palette,
+                    'score': player.score
+                }
+                for player in self.lost_players
+            ],
+            'game_over': self.game_over
+        }
+
+        return save_dict
+
     def run(self):
         is_running = True
         while is_running:
             is_running = self.turn()
-        self.__player_index = 0
+        if self.advanced:
+            self.add_scores()
+            print(self.current_player().score, 'SCORE')
+            if self.current_player().score == 40:
+                self.game_over = True
+
+        self.player_index = 0
         self.congratulation_winner()
-        self.add_scores()
 
     def turn(self) -> bool:
         # print(self.central_card.color)
@@ -125,21 +199,23 @@ class RED7GAME:
                 index = int(input('What to play?: \n'))
                 in_center, in_palette = playable_cards[index-1]
 
-            print(f'{current_player.name}: Играет {in_palette}')
-            take_one = False
-            if in_center is not None:
-                take_one = True if in_center.number > len(current_player.palette) else False
-                self.central_card = in_center
+            print(f'{current_player.name}: Играет {in_center, in_palette}')
+
+            # take_one = False
+            # if in_center is not None:
+            #     take_one = True if in_center.number > len(current_player.palette) else False
+            #     self.central_card = in_center
+            # if take_one:
+            #     new_card = self.deck.draw()
+            #     current_player.hand.add(new_card)
 
             current_player.add_to_palette(in_palette)
 
-            if take_one:
-                new_card = self.deck.draw()
-                current_player.hand.add(new_card)
         else:
             # Если подходящей карты нет...
             print(f'{current_player.name}: Выбывает')
-            self.players.remove(current_player)
+            self.player_remove(current_player)
+            # self.players.remove(current_player)
             self.player_index -= 1
             if len(self.players) == 1:
                 return False
@@ -193,8 +269,9 @@ class RED7GAME:
         print(f'Поздравляем, {self.current_player().name} выиграл!')
 
     def add_scores(self):
-        player = self.current_player
-        player.score = player.palette.score_count(self.central_card.color)
+        player = self.current_player()
+        score = player.palette.score_count(self.central_card.color)
+        player.add_score(score)
 
     def current_player(self):
         """Текущий игрок"""
@@ -204,6 +281,10 @@ class RED7GAME:
         """ Ход переходит к следующему игроку. """
         size = len(self.players)
         self.player_index = (self.player_index + 1) % size
+
+    def player_remove(self, current_player):
+        self.lost_players.append(current_player)
+        self.players.remove(current_player)
 
 
 game_state = {
@@ -230,5 +311,15 @@ game_state = {
 }
 
 
-game = RED7GAME.create(False, [('ME', True), ('NOTME', True), ('OTHER', True)])
+game = RED7GAME.create(True, [('ME', True), ('NOTME', True), ('OTHER', True)])
 game.run()
+if game.advanced:
+    while True:
+        save = game.save()
+        print('New game')
+        game = game.new_game(save)
+        if game.game_over:
+            break
+        game.run()
+
+print('Конец игры')

@@ -35,7 +35,7 @@ class Player:
 
     @score.setter
     def score(self, s: int):
-        if s is int:
+        if type(s) == int:
             self.__score = s
         else:
             print('Invalid value')
@@ -58,5 +58,8 @@ class Player:
         """Играем карту с руки в палитру"""
         card = self.hand.remove(card)
         self.palette.add(card)
+
+    def add_score(self, score: int):
+        self.score += score
 
 
