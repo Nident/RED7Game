@@ -23,7 +23,7 @@ class CardList:
         return len(self.cards)
 
     def add(self, card: Card):
-        """ Добавить карту в КОНЕЦ списка. """
+        """ Add card at the end. """
         self.cards.append(card)
 
 
@@ -32,7 +32,7 @@ class Deck(CardList):
         super(Deck, self).__init__(cards)
 
     def draw(self) -> Card:
-        """ Взять 1 карту"""
+        """ Take 1 card"""
         card = self.cards[0]
         self.cards = self.cards[1:]
         return card
@@ -58,11 +58,8 @@ class Hand(CardList):
     def all_card_pairs(self) -> list:
         return list(itertools.combinations([None] + self.cards, 2))
 
-    # def playable_cards_red(self, max_card: Card) -> list[Card]:
-    #     return [card for card in self.cards if card.playable_red(max_card)]
-
     def remove(self, card: Card) -> Card:
-        """Возвращает удаленную карту"""
+        """Returns deleted card"""
         self.cards.remove(card)
         return card
 

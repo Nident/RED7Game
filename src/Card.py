@@ -22,7 +22,7 @@ class Card:
         return self.__number
 
     def __repr__(self):
-        """Возвращает сроку вида r3"""
+        """Returns string as r3"""
         return f"{self.color[0]}{self.number}"
 
     def __eq__(self, other):
@@ -33,14 +33,14 @@ class Card:
 
     @staticmethod
     def create(short_form: str):
-        """ Из строки 'r3' делает карту Card('red', 3) """
+        """ From string 'r3' makes Card('red', 3) """
         color_letter = short_form[0]
         number = int(short_form[1])
         return Card(Card.SHORT_FORM[color_letter], number)
 
     @staticmethod
     def list_from_str(text: str):
-        """ Из строки 'r3 y5 g0' делает [Card('red', 3), Card('yellow', 5), Card('green', 0)] """
+        """ From string 'r3 y5 g0' makes [Card('red', 3), Card('yellow', 5), Card('green', 0)] """
         return [Card.create(s) for s in text.split()]
 
     @classmethod

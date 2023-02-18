@@ -1,13 +1,16 @@
 from src.CardList import CardList
 from src.Card import Card
 
-# red: старшая карта
-# orange: больше всего карт одного номинала.
-# yellow: больше всего карт одного цвета.
-# green: больше всего чётных карт.
-# lightBlue: больше всего карт разных цветов
-# blue: больше всего карт, идущих по порядку
-# purple: больше всего карт номиналом меньше 4
+""" 
+ red: high card
+ orange: most cards of the same denomination.
+ yellow: most same color cards.
+ green: most even cards.
+ lightBlue: most different color cards
+ blue: most going in order cards  
+ purple: most cards denomination less 4.
+ 
+"""
 
 
 class Palette(CardList):

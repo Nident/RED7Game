@@ -51,11 +51,11 @@ class Player:
         }
 
     def no_cards(self) -> bool:
-        """ True, если в руке нет карт. """
+        """ True, if there is no cards in hand. """
         return len(self.hand) == 0
 
     def add_to_palette(self, card: Card):
-        """Играем карту с руки в палитру"""
+        """Play card from hand to palette"""
         card = self.hand.remove(card)
         self.palette.add(card)
 

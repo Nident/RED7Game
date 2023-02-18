@@ -11,14 +11,14 @@ class RED7GAME:
     HAND_SIZE = 7
 
     def __init__(self):
-        self.__deck = None    # колода
-        self.__players = None    # игроки
-        self.__player_index = None    # индекс текущего игрока
-        self.__central_card = Card('red', 0)  #
-        self.__advanced = None
-        self.__round = 1
-        self.__game_over = None
-        self.__lost_players = []
+        self.__deck: Deck = Deck([])    # deck
+        self.__players: list = []    # players
+        self.__player_index: int = -1    # current player index
+        self.__central_card: Card = Card('red', 0)  # played rule
+        self.__advanced: bool = False  # game mode
+        self.__round: int = 1  # rounds
+        self.__game_over: bool = False  #
+        self.__lost_players: list = []
 
     @property
     def deck(self):
@@ -89,10 +89,10 @@ class RED7GAME:
 
     @staticmethod
     def create(advanced, name_list: list[tuple[str, bool]], cards: list[Card] | None = None):
-        """Создаю игру"""
+        """Create game"""
         game = RED7GAME()
         if cards is None:
-            game.deck = Deck(Card.all_cards())  # Создаем колоду
+            game.deck = Deck(Card.all_cards())  # Create deck
             game.deck.shuffle()
         else:
             game.deck = Deck(cards)
@@ -106,6 +106,7 @@ class RED7GAME:
 
     @staticmethod
     def load(state: dict):
+        """Load game"""
         game = RED7GAME()
         game.deck = Deck(Card.list_from_str(state['deck']))
 
@@ -119,7 +120,7 @@ class RED7GAME:
 
     @staticmethod
     def next_round(new_game_state: dict):
-        """Создаю новую игру"""
+        """Create next round with saved last round data"""
         game = RED7GAME()
         game.deck = Deck(Card.all_cards())  # Создаем колоду
         game.deck.shuffle()
@@ -135,6 +136,7 @@ class RED7GAME:
         return game
 
     def save(self) -> dict:
+        """Save game"""
         save_dict = {
             'deck': self.deck,
             'players': [
@@ -171,8 +173,8 @@ class RED7GAME:
         if self.advanced:
             while is_running:
                 is_running = self.turn()
-            self.add_scores()
-            self.save()
+            self.add_scores()   # count scores
+            self.save()   # make game save
             self.game_over = self.final_score()
 
         else:
@@ -183,8 +185,8 @@ class RED7GAME:
         self.congratulation_winner()
 
     def turn(self) -> bool:
+        """ Returns False, if the game over. """
         # print(self.central_card.color)
-        """ Возвращает False, если игра закончена. """
 
         current_player = self.current_player()  # игрок чей сейчас ход
 
@@ -193,16 +195,16 @@ class RED7GAME:
 
         # print(playable_cards, 'it could be played')
 
-        # Если существуют карты которыми можно сыграть по данному правилу
+        # if there are cards to play
         if len(playable_cards):
             if current_player.AI:
                 r = random.randint(0, len(playable_cards)-1)
-                in_center, in_palette = playable_cards[r]  # беру любую карту
+                in_center, in_palette = playable_cards[r]  # take any cards
             else:
                 index = int(input('What to play?: \n'))
                 in_center, in_palette = playable_cards[index-1]
 
-            print(f'{current_player.name}: Играет {in_center, in_palette}')
+            print(f'{current_player.name}: plays {in_center, in_palette}')
 
             # take_one = False
             # if in_center is not None:
@@ -215,29 +217,28 @@ class RED7GAME:
             current_player.add_to_palette(in_palette)
 
         else:
-            # Если подходящей карты нет...
-            print(f'{current_player.name}: Выбывает')
+            # if there are no cards
+            print(f'{current_player.name}: Retires')
             self.player_remove(current_player)
-            # self.players.remove(current_player)
             self.player_index -= 1
             if len(self.players) == 1:
                 return False
 
-        # после розыгрыша карт печатаем руку игрока и разделитель
+        # after drawing print player and divider
         print(current_player)
         print('-' * 20)
 
-        # если все карты с руки сыграны, игра окончена
+        # if there are no cards in someone's hand game is over
         if current_player.no_cards():
             return False
 
-        # Ход переходит другому игроку.
+        # Next player move
         self.next_player()
 
         return True
 
     def get_possible_plays(self, central_card: Card) -> list:
-        """ Возвращаем первую подходящую карту для игры по правилу(rule) или None, если подходящих карт нет. """
+        """ Returns suitable cards to play by rule or None. """
         possible_plays = []
         player = self.current_player()
         current_weight = player.palette.value(central_card.color)
@@ -269,7 +270,7 @@ class RED7GAME:
 
     def congratulation_winner(self):
         self.round += 1
-        print(f'Поздравляем, {self.current_player().name} выиграл!')
+        print(f'Congrats, {self.current_player().name} won!')
         if self.advanced:
             print(f'Score: {self.current_player().score}')
 
@@ -277,14 +278,12 @@ class RED7GAME:
         player = self.current_player()
         score = player.palette.score_count(self.central_card.color)
         player.add_score(score)
-        print(player.score, 'PLAYER SCORE')
 
     def current_player(self):
-        """Текущий игрок"""
         return self.players[self.player_index]
 
     def next_player(self):
-        """ Ход переходит к следующему игроку. """
+        """ The move goes to the next player """
         size = len(self.players)
         self.player_index = (self.player_index + 1) % size
 
@@ -293,7 +292,7 @@ class RED7GAME:
         self.players.remove(current_player)
 
     def final_score(self):
-        if self.current_player().score == 40:
+        if self.current_player().score >= 40:
             return True
         return False
 
@@ -326,7 +325,6 @@ red7 = RED7GAME.create(True, [('ME', True), ('NOTME', True), ('OTHER', True)])
 if red7.advanced:
     while not red7.game_over:
         red7.run()
-        print(red7.game_over, 'GAME_OVER')
         save = red7.save()
         red7 = RED7GAME.next_round(save)
 
@@ -334,4 +332,4 @@ if red7.advanced:
 else:
     red7.run()
 
-print('Конец игры')
+print('Game over')
