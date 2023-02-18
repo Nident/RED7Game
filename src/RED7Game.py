@@ -118,7 +118,7 @@ class RED7GAME:
         return game
 
     @staticmethod
-    def new_game(new_game_state: dict):
+    def next_round(new_game_state: dict):
         """Создаю новую игру"""
         game = RED7GAME()
         game.deck = Deck(Card.all_cards())  # Создаем колоду
@@ -168,13 +168,16 @@ class RED7GAME:
 
     def run(self):
         is_running = True
-        while is_running:
-            is_running = self.turn()
         if self.advanced:
+            while is_running:
+                is_running = self.turn()
             self.add_scores()
-            print(self.current_player().score, 'SCORE')
-            if self.current_player().score == 40:
-                self.game_over = True
+            self.save()
+            self.game_over = self.final_score()
+
+        else:
+            while is_running:
+                is_running = self.turn()
 
         self.player_index = 0
         self.congratulation_winner()
@@ -188,7 +191,7 @@ class RED7GAME:
         possible_plays = self.get_possible_plays(self.central_card)
         playable_cards = self.get_playable_cards(possible_plays)
 
-        # print(playable_cards, 'it could be playeed')
+        # print(playable_cards, 'it could be played')
 
         # Если существуют карты которыми можно сыграть по данному правилу
         if len(playable_cards):
@@ -267,11 +270,14 @@ class RED7GAME:
     def congratulation_winner(self):
         self.round += 1
         print(f'Поздравляем, {self.current_player().name} выиграл!')
+        if self.advanced:
+            print(f'Score: {self.current_player().score}')
 
     def add_scores(self):
         player = self.current_player()
         score = player.palette.score_count(self.central_card.color)
         player.add_score(score)
+        print(player.score, 'PLAYER SCORE')
 
     def current_player(self):
         """Текущий игрок"""
@@ -285,6 +291,11 @@ class RED7GAME:
     def player_remove(self, current_player):
         self.lost_players.append(current_player)
         self.players.remove(current_player)
+
+    def final_score(self):
+        if self.current_player().score == 40:
+            return True
+        return False
 
 
 game_state = {
@@ -311,15 +322,16 @@ game_state = {
 }
 
 
-game = RED7GAME.create(True, [('ME', True), ('NOTME', True), ('OTHER', True)])
-game.run()
-if game.advanced:
-    while True:
-        save = game.save()
-        print('New game')
-        game = game.new_game(save)
-        if game.game_over:
-            break
-        game.run()
+red7 = RED7GAME.create(True, [('ME', True), ('NOTME', True), ('OTHER', True)])
+if red7.advanced:
+    while not red7.game_over:
+        red7.run()
+        print(red7.game_over, 'GAME_OVER')
+        save = red7.save()
+        red7 = RED7GAME.next_round(save)
+
+
+else:
+    red7.run()
 
 print('Конец игры')
