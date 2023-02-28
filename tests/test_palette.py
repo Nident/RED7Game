@@ -3,7 +3,6 @@ from src.Card import Card
 from src.Player import Player
 from src.CardList import Hand
 
-
 def test_value():
     color = 'green'
     p1 = [Card('orange', 3), Card('yellow', 6), Card('orange', 6)]

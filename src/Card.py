@@ -28,8 +28,8 @@ class Card:
     def __eq__(self, other):
         return self.color == other.color and self.number == other.number
 
-    def tiebreaker(self):
-        return abs(7 - self.COLORS.index(self.color))
+    def tiebreaker(self) -> int :
+        return 7 - self.COLORS.index(self.color)
 
     @staticmethod
     def create(short_form: str):

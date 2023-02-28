@@ -3,6 +3,7 @@ from src.CardList import Deck
 from src.Player import Player
 from src.Card import Card
 
+
 random.seed(10)
 
 
@@ -116,6 +117,7 @@ class RED7GAME:
         game.player_index = state['player_index']
         game.central_card = state['central_card']
         game.round = state['round']
+
         return game
 
     @staticmethod
@@ -197,22 +199,36 @@ class RED7GAME:
 
         # if there are cards to play
         if len(playable_cards):
-            if current_player.AI:
-                r = random.randint(0, len(playable_cards)-1)
-                in_center, in_palette = playable_cards[r]  # take any cards
-            else:
-                index = int(input('What to play?: \n'))
-                in_center, in_palette = playable_cards[index-1]
+            # if current_player.AI:
+            #     r = random.randint(0, len(playable_cards)-1)
+            #     in_center, in_palette = playable_cards[r]  # take any cards
+            #     """
+            #     current.player.ai.play_playable_cards()
+            #     """
+            # else:
+            #     index = int(input('What to play?: \n'))
+            #
+
+            play_combination = current_player.ai.play_playable_cards(playable_cards)
+            print(playable_cards)
+
+            in_center, in_palette = play_combination
 
             print(f'{current_player.name}: plays {in_center, in_palette}')
 
-            # take_one = False
-            # if in_center is not None:
-            #     take_one = True if in_center.number > len(current_player.palette) else False
-            #     self.central_card = in_center
-            # if take_one:
-            #     new_card = self.deck.draw()
-            #     current_player.hand.add(new_card)
+            take_one = False
+            if in_center is not None:
+                take_one = True if in_center.number > len(current_player.palette) else False
+                self.central_card = in_center
+
+            if take_one and not current_player.AI:
+                new_card = self.deck.draw()
+                t = input('Do u want to take card from deck: Y:yes, N:no')
+                if t == 'y':
+                    current_player.hand.add(new_card)
+            else:
+                pass
+                # current_player.ai.take_card_from_deck()
 
             current_player.add_to_palette(in_palette)
 
