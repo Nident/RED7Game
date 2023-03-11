@@ -1,6 +1,7 @@
 import random
 from src.CardList import Deck
 from src.Player import Player
+from src.abstractPlayer import PlayerHuman, PlayerRandom, PlayerMaxMin
 from src.Card import Card
 
 
@@ -89,19 +90,34 @@ class RED7GAME:
         self.__lost_players = lp
 
     @staticmethod
-    def create(advanced, name_list: list[tuple[str, bool]], cards: list[Card] | None = None):
+    # def create(advanced, name_list: list[tuple[str, bool]], cards: list[Card] | None = None):
+    def create(start_dict):
         """Create game"""
         game = RED7GAME()
-        if cards is None:
+        if start_dict['cards'] is None:
             game.deck = Deck(Card.all_cards())  # Create deck
             game.deck.shuffle()
         else:
-            game.deck = Deck(cards)
+            game.deck = Deck(start_dict['cards'])
 
-        game.players = [Player(name, [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE - 1)],
-                               [game.deck.draw()], ai) for name, ai in name_list]
+        game.players = []
+        for player in start_dict['players']:
+            if player['ai'] == 'maxmin':
+                p = PlayerMaxMin(player['name'],
+                                 [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE - 1)], [game.deck.draw()],
+                                 player['ai'])
+            elif player['ai'] == 'random':
+                p = PlayerRandom(player['name'],
+                                 [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE - 1)], [game.deck.draw()],
+                                 player['ai'])
+            else:
+                p = PlayerHuman(player['name'],
+                                [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE - 1)], [game.deck.draw()],
+                                player['ai'])
+            game.players.append(p)
+
         game.player_index = 0
-        game.advanced = advanced
+        game.advanced = start_dict['advanced']
 
         return game
 
@@ -111,8 +127,21 @@ class RED7GAME:
         game = RED7GAME()
         game.deck = Deck(Card.list_from_str(state['deck']))
 
-        game.players = [Player(p['name'], Card.list_from_str(p['hand']),
-                               Card.list_from_str(p['palette']), p['ai'], p['score']) for p in state['players']]
+        # game.players = [Player(p['name'], Card.list_from_str(p['hand']),
+        #                        Card.list_from_str(p['palette']), p['ai'], p['score']) for p in state['players']]
+
+        game.players = []
+        for player in state['players']:
+            if player['ai'] == 'maxmin':
+                p = PlayerMaxMin(player['name'], Card.list_from_str(player['hand']),
+                                 Card.list_from_str(player['palette']), player['ai'], player['score'])
+            elif player['ai'] == 'random':
+                p = PlayerRandom(player['name'], Card.list_from_str(player['hand']),
+                                 Card.list_from_str(player['palette']), player['ai'], player['score'])
+            else:
+                p = PlayerHuman(player['name'], Card.list_from_str(player['hand']),
+                                Card.list_from_str(player['palette']), player['ai'], player['score'])
+            game.players.append(p)
 
         game.player_index = state['player_index']
         game.central_card = state['central_card']
@@ -127,9 +156,22 @@ class RED7GAME:
         game.deck = Deck(Card.all_cards())  # Создаем колоду
         game.deck.shuffle()
 
-        game.players = [Player(p['name'], [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE - 1)],
-                               [game.deck.draw()], p['ai'], p['score'])
-                        for p in new_game_state['lost_players'] + new_game_state['players']]
+        # game.players = [Player(p['name'], [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE - 1)],
+        #                        [game.deck.draw()], p['ai'], p['score'])
+        #                 for p in new_game_state['lost_players'] + new_game_state['players']]
+
+        game.players = []
+        for player in new_game_state['players'] + new_game_state['lost_players']:
+            if player['ai'] == 'maxmin':
+                p = PlayerMaxMin(player['name'], [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE - 1)],
+                                 [game.deck.draw()], player['ai'], player['score'])
+            elif player['ai'] == 'random':
+                p = PlayerRandom(player['name'], [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE - 1)],
+                                 [game.deck.draw()], player['ai'], player['score'])
+            else:
+                p = PlayerHuman(player['name'], [game.deck.draw() for _ in range(RED7GAME.HAND_SIZE - 1)],
+                                [game.deck.draw()], player['ai'], player['score'])
+            game.players.append(p)
 
         game.player_index = 0
         game.advanced = new_game_state['advanced']
@@ -144,9 +186,9 @@ class RED7GAME:
             'players': [
                 {
                     'name': player.name,
-                    'ai': player.AI,
                     'hand': player.hand,
                     'palette': player.palette,
+                    'ai': player.AI,
                     'score': player.score
                 }
                 for player in self.players
@@ -158,9 +200,9 @@ class RED7GAME:
             'lost_players': [
                 {
                     'name': player.name,
-                    'ai': player.AI,
                     'hand': player.hand,
                     'palette': player.palette,
+                    'ai': player.AI,
                     'score': player.score
                 }
                 for player in self.lost_players
@@ -189,6 +231,7 @@ class RED7GAME:
     def turn(self) -> bool:
         """ Returns False, if the game over. """
         # print(self.central_card.color)
+        print(f'Round {self.round}')
 
         current_player = self.current_player()  # игрок чей сейчас ход
 
@@ -199,20 +242,14 @@ class RED7GAME:
 
         # if there are cards to play
         if len(playable_cards):
-            # if current_player.AI:
-            #     r = random.randint(0, len(playable_cards)-1)
-            #     in_center, in_palette = playable_cards[r]  # take any cards
-            #     """
-            #     current.player.ai.play_playable_cards()
-            #     """
-            # else:
-            #     index = int(input('What to play?: \n'))
-            #
-
-            play_combination = current_player.ai.play_playable_cards(playable_cards)
             print(playable_cards)
 
+            play_combination = current_player.play_playable_cards(playable_cards)
+            print(play_combination)
+
             in_center, in_palette = play_combination
+
+            current_player.add_to_palette(in_palette)
 
             print(f'{current_player.name}: plays {in_center, in_palette}')
 
@@ -221,19 +258,11 @@ class RED7GAME:
                 take_one = True if in_center.number > len(current_player.palette) else False
                 self.central_card = in_center
 
-            if take_one and not current_player.AI:
-                new_card = self.deck.draw()
-                t = input('Do u want to take card from deck: Y:yes, N:no')
-                if t == 'y':
-                    current_player.hand.add(new_card)
-            else:
-                pass
-                # current_player.ai.take_card_from_deck()
-
-            current_player.add_to_palette(in_palette)
+            if take_one:
+                current_player.take_card_from_deck(self.deck.draw())
 
         else:
-            # if there are no cards
+            """if there are no cards"""
             print(f'{current_player.name}: Retires')
             self.player_remove(current_player)
             self.player_index -= 1
@@ -318,16 +347,16 @@ game_state = {
     'players': [
         {
             'name': 'Bob',
-            'ai': True,
             'hand': 'r3 r5',
             'palette': 'y4 p2',
+            'ai': 'random',
             'score': 0
         },
         {
             'name': 'Charley',
-            'ai': False,
             'hand': 'b1 g2',
             'palette': 'l5 p6',
+            'ai': 'maxmin',
             'score': 0
         }
     ],
@@ -337,7 +366,27 @@ game_state = {
 }
 
 
-red7 = RED7GAME.create(True, [('ME', True), ('NOTME', True), ('OTHER', True)])
+start_game_dict = {
+    'cards': None,
+    'advanced': True,
+    'players': [
+        {
+            'name': 'ME',
+            'ai': 'human'
+        },
+        {
+            'name': 'NOTME',
+            'ai': 'random'
+        },
+        {
+            'name': 'OTHER',
+            'ai': 'maxmin'
+        }
+    ]
+}
+
+# red7 = RED7GAME.create(True, [('ME', True), ('NOTME', True), ('OTHER', True)])
+red7 = RED7GAME.create(start_game_dict)
 if red7.advanced:
     while not red7.game_over:
         red7.run()
